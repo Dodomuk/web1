@@ -1,0 +1,43 @@
+#mainbtn{
+    background-color: palevioletred;
+    padding: 15px;
+
+}
+#indexBody {
+    background: radial-gradient(rgb(159, 211, 212), #00AAAA);
+    font-size: 1.2em;
+    width: 50%;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    min-height: 50vh;
+}
+
+#songList{
+    background: lightcyan;
+    border-radius: 10px;
+    text-align: left;
+}
+
+li{
+    padding: 15px;
+}
+
+li:hover {
+    cursor: pointer;
+}
+
+
+#controls {
+    border: 1px lightgray solid;
+    border-radius: 10px;
+    background: lightcyan;
+    padding: 1.5em;
+    cursor: pointer;
+    color: lightslategray;
+}
+
+progress {
+    width: 80%;
+    margin: 10px;
+}
