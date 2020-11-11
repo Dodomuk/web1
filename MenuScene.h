@@ -13,12 +13,12 @@ using namespace cocos2d;
 class MenuScene : public cocos2d::Scene
 {
 private:
+
     cocos2d::Sprite* cat;
     cocos2d::Sprite* bgLayer_1;
     cocos2d::Sprite* bgLayer_2;
     cocos2d::Sprite* bgLayer_t;
 
-    //CocosDenshion::SimpleAudioEngine* audio;
 
 
 public:

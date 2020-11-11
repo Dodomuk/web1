@@ -1,6 +1,6 @@
 
 #include "MenuScene.h"
-//#include "audio/include/SimpleAudioEngine.h"
+#include "audio/include/SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -15,19 +15,15 @@ bool MenuScene::init()
     {
         return false;
     }
-    
+ 
     //파티클 효과를 위한 리스너
     auto listenerB = EventListenerTouchOneByOne::create();
     listenerB->onTouchBegan = CC_CALLBACK_2(MenuScene::onTouchBegan, this);
     Director::getInstance()->getEventDispatcher()
         ->addEventListenerWithSceneGraphPriority(listenerB, this);
 
-    /*auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-    audio->preloadEffect("music/explosion.wav");*/
-
     initAll();
     initData();
-    initParticle();
     initBG();
     AnimationScene();
     initGameOver();
@@ -154,6 +150,16 @@ void MenuScene::AnimationScene()
     cat->runAction(RepeatForever::create(actionC));
 
 }
+void MenuScene::initHighScore()
+{
+
+    int highscore = UserDefault::getInstance()->getIntegerForKey("HIGHSCORE", score);
+    auto label = Label::createWithSystemFont(StringUtils::format("SCORE : %d / %d", score, highscore), "", 50);
+    label->setAnchorPoint(Point(0, 1));
+    label->setPosition(Point(10, winSize.height - 30));
+    label->setTag(4);
+    this->addChild(label);
+}
 void MenuScene::resetJump()
 {
     isJump = false;
@@ -166,18 +172,13 @@ void MenuScene::resetParticle(Ref* sender)
     this->removeChild(particle);
 
 }
+//void MenuScene::resetEffect
 bool MenuScene::onTouchBegan(Touch* touch, Event* unused_event)
 {
     Point location = touch->getLocation();
     auto removeSpr = Sprite::create();
 
     Sprite* spr = (Sprite*)this->getChildByTag(TAG_SPRITE_CAT);
-
-    //내가 만든 파티클
-    auto particle = ParticleSystemQuad::create("pics/particle_1.plist");
-    particle->setPosition(touch->getLocation());
-    particle->setScale(0.5);
-    this->addChild(particle);
 
     for (Sprite* spr1 : birds) {
         Rect rect = spr1->getBoundingBox();
@@ -189,11 +190,33 @@ bool MenuScene::onTouchBegan(Touch* touch, Event* unused_event)
     }
     if (birds.contains(removeSpr))
     {
+
         birds.eraseObject(removeSpr);
 
-        score += 10;
 
-        if (score >= UserDefault::getInstance()->getIntegerForKey("HIGHSCORE")); {
+        //내가 만든 파티클
+        auto particle = ParticleSystemQuad::create("pics/particle_1.plist");
+        particle->setPosition(touch->getLocation());
+        particle->setScale(0.5);
+        this->addChild(particle);
+        //0.8초 뒤 파티클 삭제 후 다시 파티클 초기화
+        auto action = Sequence::create(DelayTime::create(0.8),
+            CallFuncN::create(CC_CALLBACK_1(MenuScene::resetParticle, this)),
+            NULL
+        );
+        particle->runAction(action);
+        
+        //효과음 시작
+        auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+        audio->preloadEffect("music/explosion.wav");
+        audio->playEffect("music/explosion.wav");
+
+        score += 10; //점수 증가
+
+        int highscore = UserDefault::getInstance()->getIntegerForKey("HIGHSCORE");
+
+        if (score >= highscore)
+        {
             UserDefault::getInstance()->setIntegerForKey("HIGHSCORE", score);
             UserDefault::getInstance()->flush();
         }
@@ -203,22 +226,13 @@ bool MenuScene::onTouchBegan(Touch* touch, Event* unused_event)
 
     }
 
-    //Rect rect2 = spr->getBoundingBox();
-    //    isParticle = true;
-    //    auto action = Sequence::create(
-    //        DelayTime::create(1.0),
-    //        CallFuncN::create(CC_CALLBACK_1(MenuScene::resetParticle, this)),
-    //        NULL
-    //    );
-    //    FadeOut* action_fo = FadeOut::create(0.05);
-    //    particle->runAction(action);
-    //    sprBird->runAction(action_fo);
     if (isStop) {
         Director::getInstance()->resume();
         isStop = false;
     }
-    else
-    if (!isJump) {
+    Rect rect2 = spr->getBoundingBox();
+
+    if (rect2.containsPoint(location)) {
         isJump = true;
       
         auto action = Sequence::create(
@@ -288,13 +302,4 @@ void MenuScene::actionGameEnd(bool isGameClear)
         
     }
     label->runAction(action);
-}
-void MenuScene::initHighScore()
-{
-    int highscore = UserDefault::getInstance()->getIntegerForKey("HIGHSCORE", 0);
-    auto label = Label::createWithSystemFont(StringUtils::format("SCORE : %d / %d", score,highscore), "", 50);
-    label->setAnchorPoint(Point(0, 1));
-    label->setPosition(Point(10, winSize.height - 30));
-    label->setTag(4);
-    this->addChild(label);
 }
