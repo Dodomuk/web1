@@ -49,10 +49,10 @@ public class OverAverage {
 								
 				}
 				}
-				System.out.println(overAvg);
-				System.out.println(nArr.length);
-				double overAvgs = ((double)overAvg / (nArr.length))*100;
-				System.out.println(overAvgs);
+				//첫번째 *100은 기준을 0% ~ 100% 사이로 잡기 위함, 두번째 *1000은 Math.round 후 정수로 반환되면 다시 1000으로 나눠
+				//소숫점 뒤에 3자리를 만들어 놓기 위함
+				double overAvgs = (double)Math.round(((double)overAvg / (nArr.length))*100*1000)/1000; 
+				
 	         			//소수점 3자리 표현식
 						sb.append(overAvgs + "%");	
 						sb.append("\n");				
