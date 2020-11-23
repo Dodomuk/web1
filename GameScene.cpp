@@ -68,12 +68,20 @@ void GameScene::initPlane()
 {
     // ===========================비행기
 
-
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("airplane.plist");
     auto plane_1 = Sprite::create("airplane.png");
     plane_1->setPosition(Vec2(winSize.width / 2, winSize.height / 4));
-    plane_1->setScale(0.06);
     plane_1->setTag(1);
+    plane_1->setScale(0.5);
     this->addChild(plane_1,1);
+    auto animation = Animation::create();
+    animation->setDelayPerUnit(0.2);
+    for (int i = 1; i < 4; i++) {
+        auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(StringUtils::format("plane_%d.png", i));
+        animation->addSpriteFrame(frame);
+    }
+    auto animate = Animate::create(animation);
+    plane_1->runAction(RepeatForever::create(animate));
 
 }
 void GameScene::setMissile(float delta)
@@ -106,19 +114,47 @@ void GameScene::setUfo(float delta)
     float x = rand() % ((int)winSize.width - 70);
     float y = winSize.height;
 
-    auto ufo = Sprite::create("ufo.png"); // 1000*879 /2 = 500*439.5
-    ufo->setPosition(Point(x, y));
-    ufo->setScale(0.1);
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ufo.plist");
+    auto ufo = Sprite::create("ufo.png");
+    ufo->setPosition(Point(x, y) + Vec2(0,100));
     ufo->setTag(3);
     this->addChild(ufo);
 
-    ufos.pushBack(ufo);
+    auto animation = Animation::create();
+    animation->setDelayPerUnit(0.2);
+    for (int i = 1; i < 6; i++) {
+        auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(StringUtils::format("ufo %d.png", i));
+        animation->addSpriteFrame(frame);
+    }
+
+    auto animate = Animate::create(animation);
 
     auto action = Sequence::create(
-        MoveBy::create(2.5, Vec2(0, -1600 - 200)),
+        MoveBy::create(4.0, Vec2(0, -1600 - 200)),
         CallFuncN::create(CC_CALLBACK_1(GameScene::resetUfo, this)),
         NULL);
     ufo->runAction(action);
+    ufo->runAction(RepeatForever::create(animate));
+
+    ufos.pushBack(ufo);
+
+    //float x = rand() % ((int)winSize.width - 70);
+    //float y = winSize.height;
+
+    //auto ufo = Sprite::create("ufo.png"); // 1000*879 /2 = 500*439.5
+    //ufo->setPosition(Point(x, y));
+    //ufo->setScale(0.1);
+    //ufo->setTag(3);
+    //this->addChild(ufo);
+
+    //ufos.pushBack(ufo);
+
+    //auto action = Sequence::create(
+    //    MoveBy::create(2.5, Vec2(0, -1600 - 200)),
+    //    CallFuncN::create(CC_CALLBACK_1(GameScene::resetUfo, this)),
+    //    NULL);
+    //ufo->runAction(action);
+
 }
 void GameScene::resetUfo(Ref* sender)
 {
@@ -140,6 +176,7 @@ void GameScene::update(float delta)
             Rect rectUfo = ufo->getBoundingBox();
             /*  Rect rectPlane = Rect(sprPlane->getPositionX(), sprPlane->getPositionY(),
           sprPlane->getContentSize().width, sprPlane->getContentSize().height);*/
+
             if (rectMissile.intersectsRect(rectUfo)) { //미사일과 적이 충돌할 경우
                 removeMissile = missile_1;
                 removeUfo = ufo;
@@ -148,10 +185,12 @@ void GameScene::update(float delta)
 
                 GameOver();
                 allStop();
-
+                resetContain();
             }
         }
     }
+
+
     if (missiles.contains(removeMissile)) {
         resetMissile(removeMissile);
         resetUfo(removeUfo);
@@ -196,9 +235,19 @@ void GameScene::changeScenes(Ref* sender)
 {
     auto scene = TransitionPageTurn::create(1.0, MenuScene::createScene(), true);
     Director::getInstance()->replaceScene(scene);
+    
 }
 void GameScene::allStop()
 {
     this->unschedule(schedule_selector(GameScene::setMissile));
     this->unschedule(schedule_selector(GameScene::setUfo));
+}
+void GameScene::resetContain()
+{
+    for (Sprite* missile_1 : missiles) {
+        removeChild(missile_1);
+    }
+    for (Sprite* ufo : ufos) {
+        removeChild(ufo);
+    }
 }

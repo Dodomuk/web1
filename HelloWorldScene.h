@@ -7,7 +7,8 @@
 USING_NS_CC;
 
 #define TAG_SPRITE_PLANE            1
-
+#define TAG_SPRITE_MISSILE          2  
+#define TAG_LABEL_GAMEOVER          10
 
 class GameScene : public cocos2d::Scene
 {
@@ -28,8 +29,6 @@ public:
     
     Vector<Sprite*> ufos, missiles;
 
-    bool isTurn;
-
     void update(float delta);
     void initData();
     void initBG();
@@ -41,10 +40,10 @@ public:
     void setUfo(float delta);
     void resetUfo(Ref* sender);
   
-    void GameOver();
-    void allStop();
-    void changeScenes(Ref* sender);
-    void resetContain();
+    void actionGameEnd(bool isGameOver);
+    void endGameEnd();
+    void initGameOver();
+    //bool isStop;
 
     bool onTouchBegan(Touch* touch, Event* unused_event);
     void onTouchMoved(Touch* touch, Event* unused_event);
