@@ -2,8 +2,10 @@
 
 #include "MenuScene.h"
 #include "GameScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
 
 Scene* MenuScene::createScene()
 {
@@ -17,6 +19,8 @@ bool MenuScene::init()
     {
         return false;
     }
+
+    StartMusic();
 
     auto bgLayer = Layer::create();
     this->addChild(bgLayer);
@@ -43,8 +47,18 @@ bool MenuScene::init()
 }
 void MenuScene::changeScene(Ref* sender)
 {
+    StopMusic();
     auto scene = TransitionSplitRows::create(1.5, GameScene::createScene());
     Director::getInstance()->replaceScene(scene);
+}
+void MenuScene::StartMusic()
+{
+    CocosDenshion::SimpleAudioEngine* music = CocosDenshion::SimpleAudioEngine::getInstance();
+    music->playBackgroundMusic("LetsHuntAliens.mp3");
+}
+void MenuScene::StopMusic()
+{
+    SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
 void MenuScene::menuCallback(Ref* pSender)
 {

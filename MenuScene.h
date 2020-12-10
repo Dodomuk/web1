@@ -15,6 +15,10 @@ public:
     CREATE_FUNC(MenuScene);
 
     void changeScene(Ref* sender);
+
+    void StartMusic();
+    void StopMusic();
+
     void menuCallback(Ref* pSender);
 };
 

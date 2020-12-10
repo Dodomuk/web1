@@ -6,14 +6,15 @@
 
 USING_NS_CC;
 
-#define TAG_SPRITE_PLANE            1
+#define TAG_SPRITE_PLANE            1000
+#define PADDING_SCREEN              10
 
+#define TAG_LABEL_LIFE              99
+#define TAG_LABEL_HIGHSCORE         100
 
 class GameScene : public cocos2d::Scene
 {
-
 public:
-
     
     static cocos2d::Scene* createScene();
 
@@ -23,24 +24,39 @@ public:
 
     Size winSize;
 
-    Vec2 location;
-    Vec2 locationPlane;
+    Vec2 location,locationPlane;
     
-    Vector<Sprite*> ufos, missiles;
+    Vector<Sprite*> ufos, redufos, items, missiles;
 
+    bool isGetItem;
     bool isTurn;
 
     void update(float delta);
     void initData();
     void initBG();
     void initPlane();
-  
+    void initScore();
+    void initLife();
+
+ 
+    void setLabelLife();
+    void setParticle();
+
+    int newScore,score, highscore, life;
+    void sum(int score);
+    void resetParticle(Ref* sender);
+    void resetGetItem(float delta);
+
     void setMissile(float delta);
     void resetMissile(Ref* sender);
     
+    void setItem(float delta);
+    void resetItem(Ref* sender);
+
     void setUfo(float delta);
     void resetUfo(Ref* sender);
-  
+    void resetRedUfo(Ref* sender);
+
     void GameOver();
     void allStop();
     void changeScenes(Ref* sender);
@@ -49,7 +65,8 @@ public:
     bool onTouchBegan(Touch* touch, Event* unused_event);
     void onTouchMoved(Touch* touch, Event* unused_event);
 
-
+    void StartMusic();
+    void StopMusic();
 };
 
 #endif // __GameScene_SCENE_H__
