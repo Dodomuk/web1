@@ -1,0 +1,121 @@
+Git Bash 사용법
+
+
+
+☆기본적인 명령어
+
+화면 초기화 : Ctrl + L
+한 행의 처음과 끝 : Ctrl + A, Ctrl + E
+목록 보기 : ls 또는 dir
+파일의 내용 보기 : cat
+특정 문자를 검색 : grep
+디렉터리로 이동 : cd
+디렉터리 생성 : mkdir
+파일 삭제 : rm
+파일 생성 : touch
+
+
+
+☆git config (최초 한번만 실행)
+
+// git commit에 사용될 username
+git config --global user.name "your_name"
+
+// git commit에 사용될 email
+git config --global user.email "your_email@example.com"
+
+// 설정한 내용을 확인할 수 있다.
+git config --list
+
+
+
+☆git init (현재 디렉토리를 로컬 저장소로 설정)
+
+// 로컬저장소로 설정할 프로젝트 위치로 이동한다.
+cd C:/dev/workspace/eom2017
+ 
+// 로컬저장소로 설정한다.
+// (master) 브랜치로 보이면 성공한 것이다.
+git init
+ 
+// 만약 init을 취소하려면 아래의 명령어를 입력한다.
+rm -r .git
+
+
+
+☆git status
+//로컬저장소의 현재 상태를 보여준다.
+
+
+
+☆git add
+//파일을 준비영역(Staging Area)으로 옮긴다. (GitHub와 연동하려면 git remote로 원격 저장소와 연결해야 함)
+
+// a.html 파일만 추가
+git add a.html
+ 
+// 워킹 디렉터리 내 모든 파일을 추가
+git add .
+ 
+// 명령 프롬프트에서 상호작용하면서 추가 (나갈땐 q를 입력)
+git add -i
+ 
+// 진행중인 파일일 경우, Staging Area에서 워킹 디렉터리로 옮겨온다. 
+$git rm --cached a.html
+$git rm -r --cached .
+
+
+
+
+☆git commit
+//준비영역(Staging Area)의 파일을 로컬저장소에 저장한다.
+
+// 에디터가 출력되고, 에디터에서 커밋 메시지 입력 후 저장하면 커밋됨
+git commit
+ 
+// 간단한 커밋 메시지를 입력후 커밋
+git commit -m "커밋 메시지"
+ 
+// Staging Area에 들어간 파일에 대해서만 (워킹 디렉터리는 적용 X)
+git commit -a -m "커밋 메시지"
+
+
+
+☆git log(로컬저장소의 커밋 이력을 조회한다)
+
+// 커밋 이력 상세조회
+git log 
+ 
+// 커밋 이력중 커밋ID, 타이틀 메시지만 조회
+git log --oneline
+ 
+// 모든 브랜치 커밋 이력 조회
+git log --oneline --decorate --graph --all
+ 
+// 특정 파일의 변경 커밋 조회
+git log -- a.html
+
+
+
+
+☆git remote(로컬저장소와 원격저장소를 연결한다.)
+
+// Github 원격저장소와 연결한다.
+git remote add origin [자신의 Github 원격저장소 주소]
+ 
+// 연결된 원격저장소 확인한다.
+git remote -v
+
+
+
+☆git push
+
+// 원격저장소에 저장한다.
+git push -u origin master
+ 
+// 에러 - ! [rejected] master -> master (fetch first)
+// 이미 변경된 파일이 원격저장소에 있을경우 발생
+git pull origin master 
+ 
+// 에러 - ! [rejected] master -> master (non-fast-forward)
+git push origin +master
