@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="speech_result" />
+    <button type="button" onclick="startSpeechRecognition()">음성 녹음</button>
+    <button type="button" onclick="endSpeechRecognition()">녹음 중지</button>
+    <script>
+    let recognition = null;
+    function checkCompatibility(){       
+ 
+        recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition) ();
+        recognition.lang = "ko";  //추후에 한국어로도 확인바람
+        recognition.maxAlternatives = 3; //유사 단어 5개로 제한!!
+        if(!recognition)
+        {
+            alert("확인이 불가합니당");
+        }        
+}
+ 
+     function startSpeechRecognition(){
+         console.log("시작");
+         recognition.soundstart("입력하세요");
+         recognition.addEventListener("speechstart",() =>{
+             console.log("음성 녹음 시작");
+         });
+         recognition.start();
+         
+         recognition.addEventListener("result", (event) =>{
+             console.log("음성 녹음 결과", event.results);
+            const text = event.results[0][0].transcript; //가장 confidence(정확도)가 높은 값을 가져옴
+            document.getElementById('speech_result').value = text;
+            if(text == "네이버"){
+             location.href ="http://www.naver.com";
+         }else if(text == "구글"){
+             location.href ="http://www.google.com";
+         }
+        });
+
+         recognition.addEventListener("speechend",()=>{
+            console.log("음성 녹음 끝"); 
+         });     }
+
+     function endSpeechRecognition(){
+         recognition.end();
+     }
+
+     window.addEventListener('load',checkCompatibility);
+    </script>
+
+</body>
+</html>
