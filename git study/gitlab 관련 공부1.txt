@@ -1,0 +1,95 @@
+깃랩 듀토리얼
+
+1.gitLab 로그인
+
+2.상단 + 버튼 혹은 projects를 눌러 프로젝트 생성
+
+3.https://git-scm.com/를 통해 운영체제에 맞는 버전 다운로드
+
+4.git --version을 통해 설치 여부 확인
+
+5.git config --global user.name "xxxx" //gitlab 등록 닉네임
+  git config --global user.email "xxxx" //gitlab 등록 이메일
+  git config --global --list //정보 확인
+   
+6. 데모 프로젝트/폴더 생성 & 깃에 추가
+
+7. cmd 또는 bash에서 CD to the location of the folderand run following command 
+ -> cd 폴더경로 
+  * git init 입력 //깃 repository를 추가해줌
+  * git status 입력 //이 repository의 현재 현황을 보여줌
+  * git add .  //추가된 파일들을 올려줌
+  * git commit -m "입력할 커밋 말"
+  * git push -u "url" master
+ 
+8. 
+
+==========
+SSH 키
+
+SSH (Secured Shell)
+  -인증을 위해 사용
+  - ssh key를 세팅하면 gitlab 서버에 매번 username과 password를 입력하지 않아도 된다.
+  
+ 1. ssh-keygen 입력한다.
+  MAC일 경우 : 터미널에서 커맨드를 실행
+  WINDOW : putty나 git bash를 사용 
+  
+ 2. gitlab 계정에 로그인 후 -> settings -> ssh keys 
+
+ 3. 사용자 파일의 .ssh 파일 안에 있는 id_rsa.pub의 내용을 복사 붙여넣기 한다. (키 추가)
+
+ 4. ssh key 추가
+
+==========
+GitLab Runner 등록 및 실행하기
+
+GitLab Runner : 
+-주로 GitLab CI에서 쓰인다
+*GitLab CI : Open source continuous integration service included with GitLab
+         -작업들을 실행하거나 결과를 GitLab으로 보내기 위해 사용
+
+ 1. GitLab Runner 다운
+ ( https://docs.gitlab.com/runner/install/index.html )
+
+   gitlab-runner.exe install // 
+   gitlab-runner.exe start  //runner 설치 및 실행
+   gitlab-runner --version //설치되어있는지 확인
+
+ 2. GitLab Runner에 등록한다
+
+ - register 페이지로 이동 (https://docs.gitlab.com/runner/register/index.html)
+ - gitlab-runner.exe stop 후 gitlab-runner.exe register 입력
+ - 
+ 3. GitLab Runner 실행
+ -gitlab-runner.exe start
+ 
+ 4. Check runner is started in the project
+
+
+
+=============
+
+GitLab CI
+
+  * CI 는 GitLab 8.0 이상에는 모두 포함되어 있다.
+
+  1: .gitlab-ci.yml를 프로젝트 또는 repository 에 root folder에 추가한다.   
+
+//
+  demo_job_1:
+     tags:
+	   - ci
+	 script:
+	   - echo Hello World
+// 입력 후 .gitlab-ci.yml 저장
+  * http://www.yamllint.com/에서 yaml 파일이 사용 가능한지에 대한 여부 확인 가능
+ * Windows : Notepad, notepad++ 등의 에디터 사용 가능
+  
+  2: Commit and push file to gitlab repo
+
+  3. Create GitLab runner for the project ( 전 과정 동일)
+  
+  4. runner 실행
+ 
+  5. project에 변경점 추가(파일 추가 등) -> 커밋 -> 푸시 
