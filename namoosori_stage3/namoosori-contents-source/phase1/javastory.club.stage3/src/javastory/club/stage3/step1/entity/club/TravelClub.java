@@ -34,14 +34,14 @@ public class TravelClub implements AutoIdEntity {
     @Override
     public String toString() {
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        builder.append("Travel Club Id:").append(usid);
-        builder.append(", name:").append(name);
-        builder.append(", intro:").append(intro);
-        builder.append(", foundation day:").append(foundationDay);
+        sb.append("Travel Club Id:").append(usid);
+        sb.append(", name:").append(name);
+        sb.append(", intro:").append(intro);
+        sb.append(", foundation day:").append(foundationDay);
 
-        return builder.toString();
+        return sb.toString();
 
     }
 
