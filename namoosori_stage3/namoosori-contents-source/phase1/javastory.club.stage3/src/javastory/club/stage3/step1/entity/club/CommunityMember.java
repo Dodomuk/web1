@@ -71,6 +71,10 @@ public class CommunityMember implements Entity {
         return email;
     }
 
+    public List<ClubMembership> getMembershipList(){
+    return this.membershipList;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -1,5 +1,6 @@
 package javastory.club.stage3.step3.ui.menu;
 
+import javastory.club.stage3.step3.ui.console.BoardConsole;
 import javastory.club.stage3.util.Narrator;
 import javastory.club.stage3.util.TalkingAt;
 

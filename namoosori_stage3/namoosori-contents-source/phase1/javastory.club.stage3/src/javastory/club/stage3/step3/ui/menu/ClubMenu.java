@@ -1,5 +1,6 @@
 package javastory.club.stage3.step3.ui.menu;
 
+import javastory.club.stage3.step3.ui.console.ClubConsole;
 import javastory.club.stage3.util.Narrator;
 import javastory.club.stage3.util.TalkingAt;
 
@@ -28,7 +29,7 @@ public class ClubMenu {
             inputNum = selectMenu();
 
             switch (inputNum) {
-                //
+
                 case 1:
                     clubConsole.register();
                     break;
@@ -54,7 +55,6 @@ public class ClubMenu {
     }
 
     private void displayMenu() {
-        //
         narrator.sayln("");
         narrator.sayln("..............................");
         narrator.sayln(" Club menu ");
@@ -71,7 +71,6 @@ public class ClubMenu {
     }
 
     private int selectMenu() {
-        //
         System.out.print("Select: ");
         int menuNumber = sc.nextInt();
 

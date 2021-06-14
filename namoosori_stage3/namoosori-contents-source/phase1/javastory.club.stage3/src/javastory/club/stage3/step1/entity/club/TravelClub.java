@@ -129,7 +129,16 @@ public class TravelClub implements AutoIdEntity {
         return membershipList;
     }
 
-    public void setMembershipList(List<ClubMembership> membershipList) {
-        this.membershipList = membershipList;
+    public ClubMembership getMembershipBy(String email){
+        if(email == null || email.isEmpty()){
+            return null;
+        }
+
+        for (ClubMembership clubMembership : this.membershipList) {
+            if(email.equals(clubMembership.getMemberEmail())){
+                return clubMembership;
+            }
+        }
+        return null;
     }
 }
