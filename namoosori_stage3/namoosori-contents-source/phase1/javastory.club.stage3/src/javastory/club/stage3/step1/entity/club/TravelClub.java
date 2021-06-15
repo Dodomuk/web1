@@ -101,9 +101,9 @@ public class TravelClub implements AutoIdEntity {
     }
 
     public void setIntro(String intro) {
-        //
+
         if (intro.length() < MINIMUM_INTRO_LENGTH) {
-            //
+
             throw new IllegalArgumentException("소개는 최소 " + MINIMUM_INTRO_LENGTH + "이상이여야 합니다.");
         }
         this.intro = intro;
