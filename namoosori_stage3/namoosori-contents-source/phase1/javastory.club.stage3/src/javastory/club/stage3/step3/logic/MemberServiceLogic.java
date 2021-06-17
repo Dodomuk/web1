@@ -1,5 +1,8 @@
 package javastory.club.stage3.step3.logic;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import javastory.club.stage3.step1.entity.club.CommunityMember;
 import javastory.club.stage3.step1.util.InvalidEmailException;
 import javastory.club.stage3.step3.logic.storage.MapStorage;
@@ -9,82 +12,80 @@ import javastory.club.stage3.step3.util.MemberDuplicationException;
 import javastory.club.stage3.step3.util.NoSuchMemberException;
 import javastory.club.stage3.util.StringUtil;
 
-import javax.swing.text.html.Option;
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class MemberServiceLogic implements MemberService {
+	//
+	private Map<String,CommunityMember> memberMap;
 
-    private Map<String, CommunityMember> memberMap;
+	public MemberServiceLogic() {
+		//
+		this.memberMap = MapStorage.getInstance().getMemberMap();
+	}
 
-    public MemberServiceLogic() {
-        this.memberMap = MapStorage.getInstance().getMemberMap();
-    }
+	@Override
+	public void register(MemberDto memberDto) throws InvalidEmailException {
+		//
+		String memberEmail = memberDto.getEmail();
 
+		Optional.ofNullable(memberMap.get(memberEmail))
+				.ifPresent(foundMember -> {
+					throw new MemberDuplicationException("It is already exist the member email: " + foundMember.getEmail());
+				});
 
-    @Override
-    public void register(MemberDto memberDto) throws InvalidEmailException {
+		memberMap.put(memberEmail, memberDto.toMember());
+	}
 
-        String memberEmail = memberDto.getEmail();
+	@Override
+	public MemberDto find(String memberEmail) {
+		//
+		return Optional.ofNullable(memberMap.get(memberEmail))
+				.map(foundMember -> new MemberDto(foundMember))
+				.orElseThrow(() -> new NoSuchMemberException("No such member with email: " + memberEmail));
+	}
 
-        Optional.ofNullable(memberMap.get(memberEmail))
-                .ifPresent(foundMember -> {
-                    throw new MemberDuplicationException("해당 이메일의 멤버가 이미 존재합니다 ..." + foundMember.getEmail());
-                });
+	@Override
+	public List<MemberDto> findByName(String memberName) {
+		//
+		Collection<CommunityMember> members = memberMap.values();
+		if (members.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return members.stream()
+				.filter(member -> member.getName().equals(memberName))
+				.map(targetMember -> new MemberDto(targetMember))
+				.collect(Collectors.toList());
+	}
 
-        memberMap.put(memberEmail,memberDto.toMember());
-    }
+	@Override
+	public void modify(MemberDto memberDto) throws InvalidEmailException {
+		//
+		String memberEmail = memberDto.getEmail();
 
-    @Override
-    public MemberDto find(String memberEmail) {
-        return Optional.ofNullable(memberMap.get(memberEmail))
-                .map(foundMember -> new MemberDto(foundMember))
-                .orElseThrow(() -> new NoSuchMemberException("해당 이메일을 가진 멤버가 존재하지 않습니다 ." + memberEmail));
-    }
+		CommunityMember targetMember = Optional.ofNullable(memberMap.get(memberEmail))
+				.orElseThrow(() -> new NoSuchMemberException("No such member with email: " + memberDto.getEmail()));
 
-    @Override
-    public List<MemberDto> findByName(String memberName) {
+		//  modify only if user inputs some value.
+		if (StringUtil.isEmpty(memberDto.getName())) {
+			memberDto.setName(targetMember.getName());
+		}
+		if (StringUtil.isEmpty(memberDto.getNickName())) {
+			memberDto.setNickName(targetMember.getNickName());
+		}
+		if (StringUtil.isEmpty(memberDto.getPhoneNumber())) {
+			memberDto.setPhoneNumber(targetMember.getPhoneNumber());
+		}
+		if (StringUtil.isEmpty(memberDto.getBirthDay())) {
+			memberDto.setBirthDay(targetMember.getBirthDay());
+		}
 
-        Collection<CommunityMember> members = memberMap.values();
-        if(members.isEmpty()){
-            return new ArrayList<>();
-        }
-        return members.stream()
-                .filter(member -> member.getName().equals(memberName))
-                .map(targetMember -> new MemberDto(targetMember))
-                .collect(Collectors.toList());
-    }
+		memberMap.put(memberEmail, memberDto.toMember());
+	}
 
-    @Override
-    public void modify(MemberDto memberDto) throws InvalidEmailException {
+	@Override
+	public void remove(String memberEmail) {
+		//
+		Optional.ofNullable(memberMap.get(memberEmail))
+				.orElseThrow(() -> new NoSuchMemberException("No such member with email: " + memberEmail));
+		memberMap.remove(memberEmail);
+	}
 
-        String memberEmail = memberDto.getEmail();
-
-        CommunityMember targetMember = Optional.ofNullable(memberMap.get(memberEmail))
-                .orElseThrow(() -> new NoSuchMemberException("해당 이메일을 가진 멤버가 존재하지 않습니다." + memberDto.getEmail()));
-
-        //value가 입력 되었을때만 수정된다.
-        if(StringUtil.isEmpty(memberDto.getName())){
-            memberDto.setName(targetMember.getName());
-        }
-        if(StringUtil.isEmpty(memberDto.getNickName())){
-            memberDto.setNickName(targetMember.getNickName());
-        }
-        if(StringUtil.isEmpty(memberDto.getPhoneNumber())){
-            memberDto.setPhoneNumber(targetMember.getPhoneNumber());
-        }
-        if(StringUtil.isEmpty(memberDto.getBirthDay())){
-            memberDto.setBirthDay(targetMember.getBirthDay());
-        }
-        memberMap.put(memberEmail,memberDto.toMember());
-
-    }
-
-    @Override
-    public void remove(String memberEmail) {
-
-        Optional.ofNullable(memberMap.get(memberEmail))
-                .orElseThrow(() -> new NoSuchMemberException("해당 이메일을 가진 멤버가 존재하지 않습니다"+ memberEmail));
-        memberMap.remove(memberEmail);
-    }
 }

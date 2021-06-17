@@ -1,11 +1,10 @@
 package javastory.club.stage3.step3.util;
 
-public class NoSuchBoardException extends RuntimeException{
+public class NoSuchBoardException extends RuntimeException {
+	//
+	private static final long serialVersionUID = 5867172506387382920L;
 
-    private static final long serialVersionUID = 6756040550144459302L;
-
-    public NoSuchBoardException(String msg){
-        super(msg);
-    }
-
+	public NoSuchBoardException(String message) {
+		super(message); 
+	}
 }

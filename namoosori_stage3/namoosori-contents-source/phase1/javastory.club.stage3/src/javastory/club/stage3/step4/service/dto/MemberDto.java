@@ -1,16 +1,16 @@
 package javastory.club.stage3.step4.service.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javastory.club.stage3.step1.entity.club.Address;
 import javastory.club.stage3.step1.entity.club.ClubMembership;
 import javastory.club.stage3.step1.entity.club.CommunityMember;
 import javastory.club.stage3.step1.util.InvalidEmailException;
 import javastory.club.stage3.step3.service.dto.ClubMembershipDto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MemberDto {
-
+	//
 	private String email; 
 	private String name; 
 	private String nickName; 
@@ -21,13 +21,13 @@ public class MemberDto {
 	private List<ClubMembershipDto> membershipList;
 	
 	private MemberDto() {
-
+		//
 		this.addresses = new ArrayList<Address>();
 		this.membershipList = new ArrayList<ClubMembershipDto>();
 	}
 	
 	public MemberDto(String email, String name, String phoneNumber) {
-
+		//
 		this();
 		this.email = email;
 		this.name = name;
@@ -35,7 +35,7 @@ public class MemberDto {
 	}
 	
 	public MemberDto(CommunityMember member) {
-
+		//
 		this(member.getEmail(), member.getName(), member.getPhoneNumber());
 		this.nickName = member.getNickName();
 		this.birthDay = member.getBirthDay();
@@ -86,8 +86,8 @@ public class MemberDto {
 			builder.append(" ["+ i +"] Club member ").append(membership.toString()).append("\n");
 			i++;
 		}
-		
-		return builder.toString(); 
+
+		return builder.toString();
 	}
 	
 	public List<Address> getAddresses() {

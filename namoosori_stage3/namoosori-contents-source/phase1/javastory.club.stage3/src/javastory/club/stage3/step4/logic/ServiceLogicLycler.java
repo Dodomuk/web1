@@ -1,23 +1,27 @@
 package javastory.club.stage3.step4.logic;
 
+import javastory.club.stage3.step4.da.map.io.MemoryMap;
+import javastory.club.stage3.step4.service.BoardService;
+import javastory.club.stage3.step4.service.ClubService;
+import javastory.club.stage3.step4.service.MemberService;
+import javastory.club.stage3.step4.service.PostingService;
+import javastory.club.stage3.step4.service.ServiceLycler;
 
-import javastory.club.stage3.step4.service.*;
-
-public class ServiceLogicLycler implements ServiceLycler {
+public class ServiceLogicLycler implements ServiceLycler{
 
     private static ServiceLycler lycler;
 
     private ClubService clubService;
     private MemberService memberService;
     private BoardService boardService;
-    private PostingService postingService;
 
-    public synchronized static ServiceLycler shareInstance(){
+    public ServiceLogicLycler() {
+    }
 
+    public static ServiceLycler getInstance(){
         if(lycler == null){
             lycler = new ServiceLogicLycler();
         }
-
         return lycler;
     }
 
@@ -36,13 +40,12 @@ public class ServiceLogicLycler implements ServiceLycler {
         if(clubService == null){
             clubService = new ClubServiceLogic();
         }
-
         return clubService;
-
     }
 
     @Override
     public MemberService createMemberService() {
+
         if(memberService == null){
             memberService = new MemberServiceLogic();
         }
@@ -51,10 +54,6 @@ public class ServiceLogicLycler implements ServiceLycler {
 
     @Override
     public PostingService createPostingService() {
-
-        if(postingService == null){
-            postingService = new PostingServiceLogic();
-        }
-        return postingService;
+        return null;
     }
 }

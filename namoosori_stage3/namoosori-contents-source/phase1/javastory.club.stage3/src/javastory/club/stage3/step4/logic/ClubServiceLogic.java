@@ -1,9 +1,13 @@
 package javastory.club.stage3.step4.logic;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javastory.club.stage3.step1.entity.club.ClubMembership;
 import javastory.club.stage3.step1.entity.club.CommunityMember;
+import javastory.club.stage3.step1.entity.club.RoleInClub;
 import javastory.club.stage3.step1.entity.club.TravelClub;
-import javastory.club.stage3.step4.da.map.ClubStoreMapLycler;
 import javastory.club.stage3.step4.service.ClubService;
 import javastory.club.stage3.step4.service.dto.ClubMembershipDto;
 import javastory.club.stage3.step4.service.dto.TravelClubDto;
@@ -12,12 +16,11 @@ import javastory.club.stage3.step4.store.MemberStore;
 import javastory.club.stage3.step4.util.ClubDuplicationException;
 import javastory.club.stage3.step4.util.MemberDuplicationException;
 import javastory.club.stage3.step4.util.NoSuchClubException;
+import javastory.club.stage3.step4.util.NoSuchMemberException;
 import javastory.club.stage3.util.StringUtil;
+import javastory.club.stage3.step4.da.map.ClubStoreMapLycler;
 
-import java.util.List;
-import java.util.Optional;
-
-public class ClubServiceLogic implements ClubService {
+public class ClubServiceLogic implements ClubService{
 
     private ClubStore clubStore;
     private MemberStore memberStore;
@@ -30,12 +33,10 @@ public class ClubServiceLogic implements ClubService {
     @Override
     public void register(TravelClubDto clubDto) {
 
-        Optional.ofNullable(clubStore.retrieve(clubDto.getUsid()))
-                .ifPresent(dto -> { throw new ClubDuplicationException("해당 이름의 클럽이 이미 존재합니다 . " + clubDto.getUsid());
-                });
+        Optional.ofNullable(clubStore.retrieveByName(clubDto.getName()))
+                .ifPresent(travelClub -> { throw new ClubDuplicationException("이미 존재하는 이름입니당");});
 
         TravelClub club = clubDto.toTravelClub();
-
         String clubId = clubStore.create(club);
 
         clubDto.setUsid(clubId);
@@ -43,32 +44,33 @@ public class ClubServiceLogic implements ClubService {
 
     @Override
     public TravelClubDto findClub(String clubId) {
-        return Optional.ofNullable(clubStore.retrieve(clubId))
+
+       return Optional.ofNullable(clubStore.retrieve(clubId))
                 .map(travelClub -> new TravelClubDto(travelClub))
-                .orElseThrow(() -> {throw new NoSuchClubException("해당 아이디를 가진 클럽이 존재하지 않습니다...");
-                });
+                .orElseThrow(() -> new NoSuchClubException("해당 아이디를 가진 클럽이 존재하지 않습니다. "));
+
     }
 
     @Override
     public TravelClubDto findClubByName(String name) {
         return Optional.ofNullable(clubStore.retrieveByName(name))
                 .map(travelClub -> new TravelClubDto(travelClub))
-                .orElseThrow(() -> {throw new NoSuchClubException("해당 이름을 가진 클럽이 존재하지 않습니다.");});
+                .orElseThrow(() -> new NoSuchClubException("해당 이름을 가진 클럽이 존재하지 않습니다."));
     }
 
     @Override
     public void modify(TravelClubDto clubDto) {
         Optional.ofNullable(clubStore.retrieveByName(clubDto.getName()))
-                .ifPresent(travelClub -> {throw new ClubDuplicationException("해당 이름을 가진 클럽이 이미 존재합니다. ");});
+                .ifPresent(travelClub -> {throw new ClubDuplicationException("해당 이름의 클럽이 이미 존재합니다.");});
 
-        TravelClub travelClub = Optional.ofNullable(clubStore.retrieve(clubDto.getUsid()))
-                .orElseThrow(() -> new NoSuchClubException("해당 아이디의 클럽이 존재하지 않습니다 . " + clubDto.getUsid()));
+        TravelClub club = Optional.ofNullable(clubStore.retrieve(clubDto.getUsid()))
+                .orElseThrow(() -> new NoSuchClubException("해당 아이디를 가진 클럽이 존재하지 않습니다 . "));
 
-        if(clubDto.getName().isEmpty()){
-            clubDto.setName(travelClub.getName());
+        if(clubDto.getName().isEmpty() || clubDto.getName() == null){
+            clubDto.setName(club.getName());
         }
-        if(StringUtil.isEmpty(clubDto.getIntro())){
-            clubDto.setIntro(travelClub.getIntro());
+        if(clubDto.getIntro().isEmpty() || clubDto.getIntro() == null){
+            clubDto.setIntro(club.getIntro());
         }
 
         clubStore.update(clubDto.toTravelClub());
@@ -77,8 +79,10 @@ public class ClubServiceLogic implements ClubService {
 
     @Override
     public void remove(String clubId) {
-        Optional.ofNullable(clubStore.exists(clubId))
-                .orElseThrow(() -> {throw new NoSuchClubException("해당 클럽이 존재하지 않습니다 .");});
+
+        if(!clubStore.exists(clubId)){
+            throw new NoSuchClubException("해당 아이디를 가진 클럽이 존재하지 않습니다.");
+        }
 
         clubStore.delete(clubId);
 
@@ -87,18 +91,6 @@ public class ClubServiceLogic implements ClubService {
     @Override
     public void addMembership(ClubMembershipDto membershipDto) {
 
-        String memberId = membershipDto.getMemberEmail();
-
-        CommunityMember member = Optional.ofNullable(memberStore.retrieve(memberId))
-                .orElseThrow(() -> new NoSuchClubException("해당 이메일을 가진 멤버가 존재하지 않습니다 . "));
-
-        TravelClub club = clubStore.retrieve(membershipDto.getClubId());
-
-        for(ClubMembership membership : club.getMembershipList()){
-            if(memberId.equals(membership.getMemberEmail())){
-                throw new MemberDuplicationException("클럽에 멤버가 이미 존재합니다." + memberId);
-            }
-        }
     }
 
     @Override

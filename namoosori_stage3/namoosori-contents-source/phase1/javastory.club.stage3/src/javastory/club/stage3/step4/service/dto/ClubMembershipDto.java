@@ -5,86 +5,90 @@ import javastory.club.stage3.step1.entity.club.RoleInClub;
 import javastory.club.stage3.util.DateUtil;
 
 public class ClubMembershipDto {
+	//
+	private String clubId; 
+	private String memberEmail; 
+	private String memberName; 
+	private RoleInClub role; 
+	private String joinDate; 
 
-    private String clubId;
-    private String memberEmail;
-    private String memberName;
-    private RoleInClub role;
-    private String joinDate;
+	public ClubMembershipDto(String clubId, String memberEmail, String memberName) {
+		//
+		this.clubId = clubId;
+		this.memberEmail = memberEmail;
+		this.memberName = memberName;
+		this.role = RoleInClub.Member;
+		this.joinDate = DateUtil.today();
+	}
+	
+	public ClubMembershipDto(ClubMembership membership) {
+		//
+		this.clubId = membership.getClubId();
+		this.memberEmail = membership.getMemberEmail();
 
-    public ClubMembershipDto(String clubId, String memberEmail){
-        this.clubId = clubId;
-        this.memberEmail = memberEmail;
-        this.role = RoleInClub.Member;
-        this.joinDate = DateUtil.today();
-    }
+		this.role = membership.getRole();
+		this.joinDate = membership.getJoinDate();
+	}
 
-    public ClubMembershipDto(ClubMembership membership){
-        this.clubId = membership.getClubId();
-        this.memberEmail = membership.getMemberEmail();
-        this.role = membership.getRole();
-        this.joinDate=membership.getJoinDate();
-    }
+	public ClubMembership toMembership() {
+		//
+		ClubMembership membership = new ClubMembership(clubId, memberEmail);
+		membership.setRole(role);
+		membership.setJoinDate(joinDate);
+		return membership;
+	}
+	
+	@Override
+	public String toString() {
+		// 
+		StringBuilder builder = new StringBuilder(); 
+		
+		builder.append("club Id:").append(clubId); 
+		builder.append(", member email:").append(memberEmail); 
+		builder.append(", name:").append(memberName); 
+		builder.append(", role:").append(role.name()); 
+		builder.append(", join date:").append(joinDate); 
+		
+		return builder.toString(); 
+	}
 
-    public ClubMembership toMembership(){
+	public String getClubId() {
+		return clubId;
+	}
 
-        ClubMembership membership = new ClubMembership(clubId,memberEmail);
-        membership.setRole(role);
-        membership.setJoinDate(joinDate);
-        return membership;
+	public void setClubId(String clubId) {
+		this.clubId = clubId;
+	}
 
-    }
+	public String getMemberEmail() {
+		return memberEmail;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
+	public void setMemberEmail(String memberEmail) {
+		this.memberEmail = memberEmail;
+	}
 
-        sb.append("클럽 아이디 : ").append(clubId);
-        sb.append(", 멤버 이메일:").append(memberEmail);
-        sb.append(", 이름:").append(memberName);
-        sb.append(", Role:").append(role.name());
-        sb.append(", join date:").append(joinDate);
+	public String getMemberName() {
+		return memberName;
+	}
 
-        return sb.toString();
-    }
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
 
-    public String getClubId() {
-        return clubId;
-    }
+	public RoleInClub getRole() {
+		return role;
+	}
 
-    public void setClubId(String clubId) {
-        this.clubId = clubId;
-    }
+	public void setRole(RoleInClub role) {
+		this.role = role;
+	}
 
-    public String getMemberEmail() {
-        return memberEmail;
-    }
+	public String getJoinDate() {
+		return joinDate;
+	}
 
-    public void setMemberEmail(String memberEmail) {
-        this.memberEmail = memberEmail;
-    }
-
-    public String getMemberName() {
-        return memberName;
-    }
-
-    public void setMemberName(String memberName) {
-        this.memberName = memberName;
-    }
-
-    public RoleInClub getRole() {
-        return role;
-    }
-
-    public void setRole(RoleInClub role) {
-        this.role = role;
-    }
-
-    public String getJoinDate() {
-        return joinDate;
-    }
-
-    public void setJoinDate(String joinDate) {
-        this.joinDate = joinDate;
-    }
+	public void setJoinDate(String joinDate) {
+		this.joinDate = joinDate;
+	}
 }

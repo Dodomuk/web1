@@ -1,5 +1,7 @@
 package javastory.club.stage3.step3.ui.console;
 
+import java.util.List;
+
 import javastory.club.stage3.step3.logic.ServiceLogicLycler;
 import javastory.club.stage3.step3.service.BoardService;
 import javastory.club.stage3.step3.service.PostingService;
@@ -14,193 +16,205 @@ import javastory.club.stage3.util.ConsoleUtil;
 import javastory.club.stage3.util.Narrator;
 import javastory.club.stage3.util.TalkingAt;
 
-import java.util.List;
-
 public class PostingConsole {
+	//
+	private BoardDto currentBoard;
 
-    private BoardDto currentBoard;
+	private BoardService boardService;
+	private PostingService postingService;
 
-    private BoardService boardService;
-    private PostingService postingService;
+	private ConsoleUtil consoleUtil;
+	private Narrator narrator;
 
-    private ConsoleUtil consoleUtil;
-    private Narrator narrator;
+	public PostingConsole() {
+		//
+		ServiceLycler serviceFactory = ServiceLogicLycler.shareInstance();
+		this.boardService = serviceFactory.createBoardService();
+		this.postingService = serviceFactory.createPostingService();
 
-    public PostingConsole() {
-        ServiceLycler serviceFactory = ServiceLogicLycler.shareInstance();
-        this.boardService = serviceFactory.createBoardService();
-        this.postingService = serviceFactory.createPostingService();
+		this.narrator = new Narrator(this, TalkingAt.Left);
+		this.consoleUtil = new ConsoleUtil(narrator);
+	}
 
-        this.narrator = new Narrator(this, TalkingAt.Left);
-        this.consoleUtil = new ConsoleUtil(narrator);
-    }
+	public boolean hasCurrentBoard() {
+		//
+		return currentBoard != null;
+	}
 
-    public boolean hasCurrentBoard() {
-        return currentBoard != null;
-    }
+	public String requestCurrentBoardName() {
+		//
+		String clubName = null;
 
-    public String requestCurrentBoardName() {
+		if (hasCurrentBoard()) {
+			clubName = currentBoard.getName();
+		}
 
-        String clubName = null;
+		return clubName;
+	}
 
-        if (hasCurrentBoard()) {
-            clubName = currentBoard.getName();
-        }
+	public void findBoard() {
+		//
+		BoardDto boardFound = null;
+		while (true) {
+			String clubName = consoleUtil.getValueOf("\n club name to find a board(0.Posting menu) ");
+			if (clubName.equals("0")) {
+				break;
+			}
+			try {
+				boardFound = boardService.findByClubName(clubName);
+				narrator.sayln("\t > Found board: " + boardFound);
+				break;
+			} catch (NoSuchClubException e) {
+				narrator.sayln(e.getMessage());
+			}
+			boardFound = null;
+		}
+		this.currentBoard = boardFound;
+	}
 
-        return clubName;
+	public void register() {
+		//
+		if (!hasCurrentBoard()) {
+			//
+			narrator.sayln("No target board yet. Find target board first.");
+			return;
+		}
 
-    }
+		while (true) {
+			String title = consoleUtil.getValueOf("\n posting title(0.Posting menu)");
+			if (title.equals("0")) {
+				return;
+			}
+			String writerEmail = consoleUtil.getValueOf("\n posting writerEmail.");
+			String contents = consoleUtil.getValueOf("\n posting contents.");
 
-    public void findBoard() {
-        BoardDto boardFound = null;
-        while (true) {
-            String clubName = consoleUtil.getValueOf("\n 찾을 게시판의 클럽 이름(0.포스팅 메뉴)");
-            if (clubName.equals("0")) {
-                break;
-            }
-            try {
-                boardFound = boardService.findByClubName(clubName);
-                narrator.sayln("\t > 찾은 게시판 : " + boardFound);
-                break;
-            } catch (NoSuchClubException e) {
-                narrator.sayln(e.getMessage());
-            }
-            boardFound = null;
-        }
-        this.currentBoard = boardFound;
-    }
+			try {
+				PostingDto postingDto = new PostingDto(title, writerEmail, contents);
+				postingDto.setUsid(postingService.register(currentBoard.getId(), postingDto));
+				narrator.sayln("Register a posting -->" + postingDto);
 
-    public void register() {
+			} catch (NoSuchBoardException | NoSuchMemberException e) {
+				narrator.sayln(e.getMessage());
+			}
+		}
 
-        if (!hasCurrentBoard()) {
-            narrator.sayln("아직 지정된 게시판이 없습니다. 게시판을 먼저 지정해주세요 . ");
-            return;
-        }
+	}
 
-        while (true) {
-            String title = consoleUtil.getValueOf("\n 포스팅 제목(0.포스팅 메뉴) ");
-            if (title.equals("0")) {
-                return;
-            }
+	public void findByBoardId() {
+		//
+		if (!hasCurrentBoard()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-            String writerEmail = consoleUtil.getValueOf("\n 포스팅할 작성자의 이메일");
-            String contents = consoleUtil.getValueOf("\n 포스팅 컨텐츠들.");
+		try {
+			List<PostingDto> postings = postingService.findByBoardId(currentBoard.getId());
+			int index = 0;
+			for (PostingDto postingDto : postings) {
+				narrator.sayln(String.format("[%d] ", index) + postingDto);
+				index++;
+			}
+		} catch (NoSuchBoardException e) {
+			narrator.sayln(e.getMessage());
+		}
+	}
 
-            try {
-                PostingDto postingDto = new PostingDto(title, writerEmail, contents);
-                postingDto.setUsid(postingService.register(currentBoard.getId(), postingDto));
-                narrator.sayln("포스팅 등록 ---> " + postingDto);
+	public void find() {
+		//
+		if (!hasCurrentBoard()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-            } catch (NoSuchBoardException | NoSuchMemberException e) {
-                narrator.sayln(e.getMessage());
-            }
-        }
-    }
+		PostingDto postingDto = null;
+		while (true) {
+			String postingId = consoleUtil.getValueOf("\n posting id to find (0.Posting menu) ");
+			if (postingId.equals("0")) {
+				break;
+			}
 
-    public void findByBoardId() {
+			try {
+				postingDto = postingService.find(postingId);
+				narrator.sayln("\t > Found posting : " + postingDto);
+			} catch (NoSuchPostingException e) {
+				narrator.sayln(e.getMessage());
+			}
+		}
+	}
 
-        boardChecker();
+	public PostingDto findOne() {
+		//
+		if (!hasCurrentBoard()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return null;
+		}
 
-        try {
-            List<PostingDto> postings = postingService.findByBoardId(currentBoard.getId());
-            int idx = 0;
-            for (PostingDto postingDto : postings) {
-                narrator.sayln(String.format("[%d}", idx) + postingDto);
-                idx++;
-            }
-        } catch (NoSuchBoardException e) {
-            narrator.sayln(e.getMessage());
-        }
-    }
+		PostingDto postingDto = null;
+		while (true) {
+			String postingId = consoleUtil.getValueOf("\n posting id to find (0.Posting menu) ");
+			if (postingId.equals("0")) {
+				break;
+			}
 
-    public void find(){
-       boardChecker();
+			try {
+				postingDto = postingService.find(postingId);
+				narrator.sayln("\t > Found posting : " + postingDto);
+				break;
+			} catch (NoSuchPostingException e) {
+				narrator.sayln(e.getMessage());
+			}
+			postingDto = null;
+		}
+		return postingDto;
+	}
 
-       PostingDto postingDto = null;
-       while(true){
-           String postingId = consoleUtil.getValueOf("\n 찾을 포스팅 아이디(0.포스팅 메뉴)");
-           if(postingId.equals("0")){
-               break;
-           }
+	public void modify() {
+		//
+		PostingDto targetPosting = findOne();
+		if (targetPosting == null) {
+			return;
+		}
 
-           try{
-               postingDto = postingService.find(postingId);
-               narrator.sayln("\t >> 찾은 포스팅 : " + postingDto);
-           }catch (NoSuchPostingException e){
-               narrator.sayln(e.getMessage());
-           }
-       }
-    }
+		String newTitle = consoleUtil.getValueOf("\n new posting title(0.Posting menu, Enter. no change)");
+		if (newTitle.equals("0")) {
+			return;
+		}
+		if (!newTitle.isEmpty()) {
+			targetPosting.setTitle(newTitle);
+		}
 
-    public PostingDto findOne(){
-        boardChecker();
+		String contents = consoleUtil.getValueOf("\n new posting contents(Enter. no change))");
+		if (!contents.isEmpty()) {
+			targetPosting.setContents(contents);
+		}
 
-        PostingDto postingDto = null;
+		try {
+			postingService.modify(targetPosting);
+			narrator.sayln("\n Modified Posting : " + targetPosting);
+		} catch (NoSuchPostingException e) {
+			narrator.sayln(e.getMessage());
+		}
 
-        while(true){
-            String postingId = consoleUtil.getValueOf("\n 찾을 포스팅 아이디(0.포스팅 메뉴)");
-            if(postingId.equals("0")){
-                break;
-            }
+	}
 
-            try{
-                postingDto = postingService.find(postingId);
-                narrator.sayln("\t >>> 찾을 포스팅 : " + postingDto);
-                break;
-            }catch(NoSuchPostingException e){
-                narrator.sayln(e.getMessage());
-            }
-            postingDto = null;
-        }
-        return postingDto;
-    }
+	public void remove() {
+		//
+		PostingDto targetPosting = findOne();
+		if (targetPosting == null) {
+			return;
+		}
 
-    public void modify(){
-        PostingDto targetPosting = findOne();
-        if(targetPosting == null){
-            return;
-        }
+		String confirmStr = consoleUtil.getValueOf("Remove this posting in the board? (Y:yes, N:no)");
+		if (confirmStr.toLowerCase().equals("y") || confirmStr.toLowerCase().equals("yes")) {
+			//
+			narrator.sayln("Removing a posting -->" + targetPosting.getTitle());
+			postingService.remove(targetPosting.getUsid());
+		} else {
+			narrator.sayln("Remove cancelled, the posting is safe. --> " + targetPosting.getTitle());
+		}
+	}
 
-        String newTitle = consoleUtil.getValueOf("\n 새로운 포스팅 제목(0.포스팅 메뉴, Enter . no change");
-        if(newTitle.equals("0")){
-            return;
-        }
-        if(!newTitle.isEmpty()){
-            targetPosting.setTitle(newTitle);
-        }
-
-        String contents = consoleUtil.getValueOf("\n 새로운 포스팅 컨텐츠(Enter, no change)");
-        if(!contents.isEmpty()){
-            targetPosting.setContents(contents);
-        }
-
-        try{
-            postingService.modify(targetPosting);
-            narrator.sayln("\n 수정된 포스팅 : " + targetPosting);
-        }catch (NoSuchPostingException e){
-            narrator.sayln(e.getMessage());
-        }
-    }
-
-    public void remove(){
-
-        PostingDto targetPosting = findOne();
-        if(targetPosting == null){
-            return;
-        }
-
-        String confirmStr = consoleUtil.getValueOf("이 포스팅을 제거하시겠습니까??? (Y: yes , N: no)");
-        if(confirmStr.toLowerCase().equals("yes") || confirmStr.toLowerCase().equals("y")){
-            postingService.remove(targetPosting.getUsid());
-        }else{
-            narrator.sayln("제거가 취소되었습니다 ....  =====> " + targetPosting.getTitle());
-        }
-    }
-
-    public void boardChecker(){
-        if (!hasCurrentBoard()) {
-            narrator.sayln("지정된 게시판이 없습니다. 게시판을 먼저 지정해주세요.");
-            return;
-        }
-    }
 }

@@ -1,12 +1,12 @@
 package javastory.club.stage3.step4.service;
 
+import java.util.List;
+
 import javastory.club.stage3.step4.service.dto.ClubMembershipDto;
 import javastory.club.stage3.step4.service.dto.TravelClubDto;
 
-import java.util.List;
-
 public interface ClubService {
-
+	//
 	void register(TravelClubDto clubDto);
 	TravelClubDto findClub(String clubId);
 	TravelClubDto findClubByName(String name);

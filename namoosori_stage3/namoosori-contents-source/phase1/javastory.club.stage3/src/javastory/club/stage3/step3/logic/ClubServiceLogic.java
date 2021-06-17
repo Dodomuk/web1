@@ -1,5 +1,8 @@
 package javastory.club.stage3.step3.logic;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import javastory.club.stage3.step1.entity.AutoIdEntity;
 import javastory.club.stage3.step1.entity.club.ClubMembership;
 import javastory.club.stage3.step1.entity.club.CommunityMember;
@@ -15,198 +18,198 @@ import javastory.club.stage3.step3.util.NoSuchClubException;
 import javastory.club.stage3.step3.util.NoSuchMemberException;
 import javastory.club.stage3.util.StringUtil;
 
-import javax.swing.text.html.Option;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class ClubServiceLogic implements ClubService {
+	//
+	private Map<String,CommunityMember> memberMap;
+	private Map<String,TravelClub> clubMap;
+	private Map<String,Integer> autoIdMap;
 
-    private Map<String, CommunityMember> memberMap;
-    private Map<String, TravelClub> clubMap;
-    private Map<String, Integer> autoIdMap;
+	public ClubServiceLogic() {
+		//
+		this.memberMap = MapStorage.getInstance().getMemberMap();
+		this.clubMap = MapStorage.getInstance().getClubMap();
+		this.autoIdMap = MapStorage.getInstance().getAutoIdMap();
+	}
 
-    public ClubServiceLogic(){
-        this.memberMap = MapStorage.getInstance().getMemberMap();
-        this.clubMap = MapStorage.getInstance().getClubMap();
-        this.autoIdMap = MapStorage.getInstance().getAutoIdMap();
-    }
+	@Override
+	public void registerClub(TravelClubDto clubDto) {
+		//
+		Optional.ofNullable(retrieveByName(clubDto.getName()))
+				.ifPresent((club) -> {
+					throw new ClubDuplicationException("Club already exists with name:" + club.getName());
+				});
 
-    @Override
-    public void registerClub(TravelClubDto clubDto) {
+		TravelClub club = clubDto.toTravelClub();
 
-        Optional.ofNullable(retrieveByName(clubDto.getName()))
-                .ifPresent((club) -> {
-                    throw new ClubDuplicationException("같은 이름의 클럽이 존재합니다." + club.getName());
-                });
+		if (club instanceof AutoIdEntity) {
+			String className = TravelClub.class.getSimpleName();
+			if (autoIdMap.get(className) == null) {
+				autoIdMap.put(className, 1);
+			}
 
-        TravelClub club = clubDto.toTravelClub();
+			int keySequence = autoIdMap.get(className);
+			String autoId = String.format("%05d", keySequence);
+			club.setAutoId(autoId);
+			autoIdMap.put(className, ++keySequence);
+		}
 
-        if (club instanceof AutoIdEntity) {
-            String className = TravelClub.class.getSimpleName();
+		clubMap.put(club.getId(),  club);
 
-            if (autoIdMap.get(className) == null) {
-                autoIdMap.put(className, 1);
-            }
+		clubDto.setUsid(club.getId());
+	}
 
-            int keySequence = autoIdMap.get(className);
-            String autoId = String.format("%05d", keySequence);
-            club.setAutoId(autoId);
-            autoIdMap.put(className, ++keySequence);
-        }
-        clubMap.put(club.getId(), club);
+	@Override
+	public TravelClubDto findClub(String clubId) {
+		//
 
-        clubDto.setUsid(club.getId());
-    }
+		return Optional.ofNullable(clubMap.get(clubId))
+				.map(foundClub -> new TravelClubDto(foundClub))
+				.orElseThrow(() -> new NoSuchClubException("No such club with id: " + clubId));
+	}
 
-    @Override
-    public TravelClubDto findClub(String clubId) {
+	@Override
+	public TravelClubDto findClubByName(String name) {
+		//
+		return Optional.ofNullable(retrieveByName(name))
+				.map(foundClub -> new TravelClubDto(foundClub))
+				.orElseThrow(() -> new NoSuchClubException("No such club with name: " + name));
+	}
 
-        return Optional.ofNullable(clubMap.get(clubId))
-                .map(foundClub -> new TravelClubDto(foundClub))
-                .orElseThrow(() -> new NoSuchClubException("클럽이 존재하지 않습니다." + clubId));
+	@Override
+	public void modify(TravelClubDto clubDto) {
+		//
+		String clubId = clubDto.getUsid();
 
-    }
+		TravelClub targetClub = Optional.ofNullable(clubMap.get(clubId))
+				.orElseThrow(() -> new NoSuchClubException("No such club with id: " + clubDto.getUsid()));
 
-    @Override
-    public TravelClubDto findClubByName(String name) {
+		if (StringUtil.isEmpty(clubDto.getName())){
+			clubDto.setName(targetClub.getName());
+		}
+		if (StringUtil.isEmpty(clubDto.getIntro())){
+			clubDto.setIntro(targetClub.getIntro());
+		}
 
-        return Optional.ofNullable(retrieveByName(name))
-                .map(foundClub -> new TravelClubDto(foundClub))
-                .orElseThrow(() -> new NoSuchClubException("클럽이 존재하지 않습니다 : " + name));
-    }
 
-    @Override
-    public void modify(TravelClubDto clubDto) {
+		clubMap.put(clubId, clubDto.toTravelClub());
+	}
 
-        String clubid = clubDto.getUsid();
+	@Override
+	public void remove(String clubId) {
+		//
+		Optional.ofNullable(clubMap.get(clubId))
+				.orElseThrow(() -> new NoSuchClubException("No such club with id: " + clubId));
+		clubMap.remove(clubId);
+	}
 
-        TravelClub targetClub = Optional.ofNullable(clubMap.get(clubid))
-                .orElseThrow(() -> new NoSuchClubException("클럽이 존재하지 않습니다 : " + clubDto.getUsid()));
+	// Membership
+	@Override
+	public void addMembership(ClubMembershipDto membershipDto) {
+		//
+		// check if member exists
+		String memberId = membershipDto.getMemberEmail();
 
-        if (StringUtil.isEmpty(clubDto.getName())) {
-            clubDto.setName(targetClub.getName());
-        }
-        if (StringUtil.isEmpty(clubDto.getIntro())) {
-            clubDto.setIntro(targetClub.getIntro());
-        }
+		CommunityMember foundMember = Optional.ofNullable(memberMap.get(memberId))
+				.orElseThrow(() -> new NoSuchClubException("No such member with email: " + memberId));
 
-        clubMap.put(clubid, clubDto.toTravelClub());
+		// check if membership exists in the club
+		String clubId = membershipDto.getClubId();
+		TravelClub foundClub = clubMap.get(clubId);
+		for (ClubMembership membership : foundClub.getMembershipList()) {
+			if (memberId.equals(membership.getMemberEmail())) {
+				throw new MemberDuplicationException("Member already exists in the club -->" + memberId);
+			}
+		}
 
-    }
+		// add membership
+		ClubMembership clubMembership = membershipDto.toMembership();
+		foundClub.getMembershipList().add(clubMembership);
+		clubMap.put(clubId, foundClub);
+		foundMember.getMembershipList().add(clubMembership);
+		memberMap.put(memberId, foundMember);
+	}
 
-    @Override
-    public void remove(String clubId) {
-        Optional.ofNullable(clubMap.get(clubId))
-                .orElseThrow(() -> new NoSuchClubException("해당 아이디 관련 클럽이 존재하지 않습니다 : " + clubId));
-        clubMap.remove(clubId);
-    }
+	@Override
+	public ClubMembershipDto findMembershipIn(String clubId, String memberId) {
+		//
+		TravelClub foundClub = clubMap.get(clubId);
 
-    @Override
-    public void addMembership(ClubMembershipDto membershipDto) {
+		ClubMembership membership = getMembershipOfClub(foundClub, memberId);
 
-        String memberId = membershipDto.getMemberEmail();
+		return new ClubMembershipDto(membership);
+	}
 
-        CommunityMember foundMember = Optional.ofNullable(memberMap.get(memberId))
-                .orElseThrow(() -> new NoSuchMemberException("해당 이메일 관련 멤버가 존재하지 않습니다 : " + memberId));
+	@Override
+	public List<ClubMembershipDto> findAllMembershipsIn(String clubId) {
+		//
 
-        String clubId = membershipDto.getClubId();
+		return clubMap.get(clubId).getMembershipList()
+				.stream()
+				.map(membership -> new ClubMembershipDto(membership))
+				.collect(Collectors.toList());
+	}
 
-        TravelClub foundClub = clubMap.get(clubId);
+	@Override
+	public void modifyMembership(String clubId, ClubMembershipDto membershipDto) {
+		//
+		String targetEmail = membershipDto.getMemberEmail();
+		RoleInClub newRole = membershipDto.getRole();
 
-        for (ClubMembership membership : foundClub.getMembershipList()) {
-            if (memberId.equals(membership.getMemberEmail())) {
-                throw new MemberDuplicationException("클럽에 멤버가 이미 존재합니다 . " + memberId);
-            }
-        }
+		// modify membership of the club.
+		TravelClub targetClub = clubMap.get(clubId);
+		ClubMembership membershipOfClub = getMembershipOfClub(targetClub, targetEmail);
+		membershipOfClub.setRole(newRole);
 
-        ClubMembership clubMembership = membershipDto.toMembership();
-        foundClub.getMembershipList().add(clubMembership);
-        clubMap.put(clubId, foundClub);
-        foundMember.getMembershipList().add(clubMembership);
-        memberMap.put(memberId, foundMember);
+		// modify membership of the member.
+		memberMap.get(targetEmail).getMembershipList()
+				.stream()
+				.filter(membershipOfMember -> membershipOfMember.getClubId().equals(clubId))
+				.forEach(membershipOfMember->membershipOfMember.setRole(newRole));
+	}
 
-    }
+	@Override
+	public void removeMembership(String clubId, String memberId) {
+		//
+		TravelClub foundClub = clubMap.get(clubId);
+		CommunityMember foundMember = memberMap.get(memberId);
 
-    @Override
-    public ClubMembershipDto findMembershipIn(String clubId, String memberId) {
+		ClubMembership clubMembership = getMembershipOfClub(foundClub, memberId);
 
-        TravelClub foundClub = clubMap.get(clubId);
+		foundClub.getMembershipList().remove(clubMembership);
+		foundMember.getMembershipList().remove(clubMembership);
 
-        ClubMembership membership = getMembershipOfClub(foundClub, memberId);
+		clubMap.put(clubId, foundClub);
+		memberMap.put(foundMember.getId(),foundMember);
+	}
 
-        return new ClubMembershipDto(membership);
+	// Private
+	private TravelClub retrieveByName(String name) {
+		//
+		Collection<TravelClub> clubs = clubMap.values();
+		if (clubs.isEmpty()) {
+			return null;
+		}
 
-    }
+		TravelClub foundClub = null;
+		for (TravelClub club : clubs) {
+			if (club.getName().equals(name)) {
+				foundClub = club;
+				break;
+			}
+		}
 
-    @Override
-    public List<ClubMembershipDto> findAllMembershipsIn(String clubId) {
-        return clubMap.get(clubId).getMembershipList()
-                .stream()
-                .map(membership -> new ClubMembershipDto(membership))
-                .collect(Collectors.toList());
-    }
+		return foundClub;
+	}
 
-    @Override
-    public void modifyMembership(String clubId, ClubMembershipDto membershipDto) {
+	private ClubMembership getMembershipOfClub(TravelClub club, String memberId) {
+		//
+		for (ClubMembership membership : club.getMembershipList()) {
+			if (memberId.equals(membership.getMemberEmail())) {
+				return membership;
+			}
+		}
 
-        String targetEmail = membershipDto.getMemberEmail();
-        RoleInClub newRole = membershipDto.getRole();
-        TravelClub targetClub = clubMap.get(clubId);
+		throw new NoSuchMemberException(String.format("No such member[email:%s] in club[name:%s]", memberId, club.getName()));
+	}
 
-        ClubMembership membershipOfClub = getMembershipOfClub(targetClub, targetEmail);
-        membershipOfClub.setRole(newRole);
-
-        memberMap.get(targetEmail).getMembershipList()
-                .stream()
-                .filter(membershipOfMember -> membershipOfMember.getClubId().equals(clubId))
-                .forEach(membershipOfMember -> membershipOfMember.setRole(newRole));
-    }
-
-    @Override
-    public void removeMembership(String clubId, String memberId) {
-
-        TravelClub foundClub = clubMap.get(clubId);
-        CommunityMember foundMember = memberMap.get(memberId);
-
-        ClubMembership clubMembership = getMembershipOfClub(foundClub, memberId);
-
-        foundClub.getMembershipList().remove(clubMembership);
-        foundMember.getMembershipList().remove(clubMembership);
-
-        clubMap.put(clubId, foundClub);
-        memberMap.put(foundMember.getId(), foundMember);
-
-    }
-
-    private TravelClub retrieveByName(String name) {
-
-        Collection<TravelClub> clubs = clubMap.values();
-        if (clubs.isEmpty()) {
-            return null;
-        }
-        TravelClub foundClub = null;
-        for (TravelClub club : clubs) {
-            if (club.getName().equals(name)) {
-                foundClub = club;
-                break;
-            }
-        }
-
-        return foundClub;
-    }
-
-    private ClubMembership getMembershipOfClub(TravelClub club, String memberId) {
-
-        for (ClubMembership clubMembership : club.getMembershipList()) {
-            if (memberId.equals(clubMembership.getMemberEmail())) {
-                return clubMembership;
-            }
-        }
-
-        throw new NoSuchMemberException(String.format("이메일 [%s] 이(가) 클럽 [%s] 에 존재하지 않습니다.", memberId, club.getName()));
-
-    }
 }

@@ -13,189 +13,182 @@ import javastory.club.stage3.util.ConsoleUtil;
 import javastory.club.stage3.util.Narrator;
 import javastory.club.stage3.util.TalkingAt;
 
-import java.util.Locale;
-
 public class ClubMembershipConsole {
+	//
+	private TravelClubDto currentClub;
 
-    private TravelClubDto currentClub;
-    private ClubService clubService;
-    private ConsoleUtil consoleUtil;
-    private Narrator narrator;
+	private ClubService clubService;
 
-    public ClubMembershipConsole() {
+	private ConsoleUtil consoleUtil;
+	private Narrator narrator;
 
-        ServiceLycler serviceFactory = ServiceLogicLycler.shareInstance();
-        this.clubService = serviceFactory.createClubService();
+	public ClubMembershipConsole() {
+		//
+		ServiceLycler serviceFactory = ServiceLogicLycler.shareInstance();
+		this.clubService = serviceFactory.createClubService();
 
-        this.narrator = new Narrator(this, TalkingAt.Left);
-        this.consoleUtil = new ConsoleUtil(narrator);
+		this.narrator = new Narrator(this, TalkingAt.Left);
+		this.consoleUtil = new ConsoleUtil(narrator);
+	}
 
-    }
+	public boolean hasCurrentClub() {
+		//
+		return currentClub != null;
+	}
 
-    public boolean hasCurrentClub() {
-        return currentClub != null;
-    }
+	public String requestCurrentClubName() {
+		//
+		String clubName = null;
 
-    public String requestCurrentClubName() {
+		if (hasCurrentClub()) {
+			clubName = currentClub.getName();
+		}
 
-        String clubName = null;
+		return clubName;
+	}
 
-        if (hasCurrentClub()) {
-            clubName = currentClub.getName();
-        }
-        return clubName;
-    }
+	public void findClub() {
+		//
+		TravelClubDto clubFound = null;
+		while (true) {
+			String clubName = consoleUtil.getValueOf("\n club name to find(0.Membership menu) ");
+			if (clubName.equals("0")) {
+				break;
+			}
+			try {
+				clubFound = clubService.findClubByName(clubName);
+				narrator.sayln("\t > Found club: " + clubFound);
+				break;
+			} catch (NoSuchClubException e) {
+				narrator.sayln(e.getMessage());
+			}
+			clubFound = null;
+		}
+		this.currentClub = clubFound;
+	}
 
-    public void findClub() {
+	public void add() {
+		//
+		if (!hasCurrentClub()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-        TravelClubDto clubFound = null;
-        while (true) {
-            String clubName = consoleUtil.getValueOf("\n 찾을 클럽 이름(0.멤버쉽 메뉴)");
-            if (clubName.equals("0")) {
-                break;
-            }
+		while(true) {
+			String email = consoleUtil.getValueOf("\n member's email to add(0.Member menu)");
+			if (email.equals("0")) {
+				return;
+			}
 
-            try {
-                clubFound = clubService.findClubByName(clubName);
-                narrator.sayln("\t > 찾은 클럽 : " + clubFound);
-                break;
-            } catch (NoSuchClubException e) {
-                narrator.sayln(e.getMessage());
-            }
+			String memberRole = consoleUtil.getValueOf(" President|Member");
 
-            clubFound = null;
-        }
-        this.currentClub = clubFound;
-    }
+			try {
+				ClubMembershipDto clubMembershipDto = new ClubMembershipDto(currentClub.getUsid(), email);
+				clubMembershipDto.setRole(RoleInClub.valueOf(memberRole));
 
-    public void add() {
+		        clubService.addMembership(clubMembershipDto);
+				narrator.sayln(String.format("Add a member[email:%s] in club[name:%s]", email, currentClub.getName()));
 
-        if (!hasCurrentClub()) {
-            narrator.sayln("지정된 클럽이 아직 없습니다. 클럽을 먼저 지정해주세요 . ");
-            return;
-        }
+			} catch (MemberDuplicationException | NoSuchClubException e) {
+				narrator.sayln(e.getMessage());
+			} catch (IllegalArgumentException e) {
+				narrator.sayln("The Role in club should be president or member.");
+			}
+		}
 
-        while (true) {
-            String email = consoleUtil.getValueOf("\n 추가할 멤버의 이메일");
+	}
 
-            if (email.equals("0")) {
-                return;
-            }
+	public void find() {
+		//
+		if (!hasCurrentClub()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-            String memberRole = consoleUtil.getValueOf("President | Member");
+		ClubMembershipDto membershipDto = null;
+		while (true) {
+			String memberEmail = consoleUtil.getValueOf("\n email to find(0.Membership menu) ");
+			if (memberEmail.equals("0")) {
+				break;
+			}
+			try {
+				membershipDto = clubService.findMembershipIn(currentClub.getUsid(), memberEmail);
+				narrator.sayln("\t > Found membership information: " + membershipDto);
+			} catch (NoSuchMemberException e) {
+				narrator.sayln(e.getMessage());
+			}
+		}
+	}
 
-            try {
+	public ClubMembershipDto findOne() {
+		//
+		ClubMembershipDto membershipDto = null;
+		while (true) {
+			String memberEmail = consoleUtil.getValueOf("\n member email to find(0.Membership menu) ");
+			if (memberEmail.equals("0")) {
+				break;
+			}
 
-                ClubMembershipDto clubMembershipDto = new ClubMembershipDto(currentClub.getUsid(), email);
-                clubMembershipDto.setRole(RoleInClub.valueOf(memberRole));
+			try {
+				membershipDto = clubService.findMembershipIn(currentClub.getUsid(), memberEmail);
+				narrator.sayln("\t > Found membership information: " + membershipDto);
+				break;
+			} catch (NoSuchMemberException e) {
+				narrator.sayln(e.getMessage());
+			}
+		}
+		return membershipDto;
+	}
 
-                clubService.addMembership(clubMembershipDto);
-                narrator.sayln(String.format("클럽에 멤버 [ %s ] 를 추가합니다 . [ %s ]", email, currentClub.getName()));
+	public void modify() {
+		//
+		if (!hasCurrentClub()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-            } catch (MemberDuplicationException | NoSuchMemberException e) {
-                narrator.sayln(e.getMessage());
-            } catch (IllegalArgumentException e) {
-                narrator.sayln("클럽에서의 롤 은 President 또는 Member 입니다.");
-            }
-        }
-    }
+		ClubMembershipDto targetMembership = findOne();
+		if (targetMembership == null) {
+			return;
+		}
 
-    public void find() {
-        if (!hasCurrentClub()) {
-            narrator.sayln("지정된 클럽이 아직 없습니다. 클럽을 먼저 지정해주세요 . ");
-            return;
-        }
+		String newRole = consoleUtil.getValueOf("new President|Member(0.Membership menu, Enter. no change)");
+		if (newRole.equals("0")) {
+			return;
+		}
+		if (!newRole.equals("")) {
+			targetMembership.setRole(RoleInClub.valueOf(newRole));
+		}
+		String clubId = targetMembership.getClubId();
+		clubService.modifyMembership(clubId, targetMembership);
 
-        ClubMembershipDto membershipDto = null;
+		ClubMembershipDto modifiedMembership = clubService.findMembershipIn(clubId, targetMembership.getMemberEmail());
+		narrator.sayln("\t > Modified membership information: " + modifiedMembership);
+	}
 
-        while (true) {
-            String memberEmail = consoleUtil.getValueOf("\n 찾을 멤버의 이메일 ");
-            if (memberEmail.equals("0")) {
-                break;
-            }
-            try {
-                membershipDto = clubService.findMembershipIn(currentClub.getUsid(), memberEmail);
-                narrator.sayln("\t > 찾은 멤버십 정보 : " + membershipDto);
-            } catch (NoSuchMemberException e) {
-                narrator.sayln(e.getMessage());
-            }
-        }
-    }
+	public void remove() {
+		//
+		if (!hasCurrentClub()) {
+			//
+			narrator.sayln("No target club yet. Find target club first.");
+			return;
+		}
 
-    public ClubMembershipDto findOne(){
+		ClubMembershipDto targetMembership = findOne();
+		if (targetMembership == null) {
+			return;
+		}
 
-        ClubMembershipDto membershipDto = null;
-
-        while(true){
-
-            String memberEmail = consoleUtil.getValueOf("\n 찾고자 하는 멤버의 이메일 : ");
-            if(memberEmail.equals("0")){
-                break;
-            }
-            try{
-
-                membershipDto = clubService.findMembershipIn(currentClub.getUsid(),memberEmail );
-                narrator.sayln("\t >> 멤버십 정보를 찾았습니다 : " + membershipDto);
-                break;
-
-            }catch(NoSuchMemberException e){
-
-                 narrator.sayln(e.getMessage());
-
-            }
-        }
-        return membershipDto;
-    }
-
-    public void modify(){
-
-        if(!hasCurrentClub()){
-            narrator.sayln("지정된 클럽이 아직 없습니다. 클럽을 먼저 지정해주세요 . ");
-            return;
-        }
-
-        ClubMembershipDto targetMembership = findOne();
-        if(targetMembership == null){
-            return;
-        }
-
-        String newRole = consoleUtil.getValueOf("새로운 롤 President | Member(0.멤버십 메뉴, 엔터시 변화없음) ");
-
-        if(newRole.equals("0")){
-            return;
-        }
-        if(!newRole.equals("")){
-            targetMembership.setRole(RoleInClub.valueOf(newRole));
-        }
-
-        String clubId = targetMembership.getClubId();
-        clubService.modifyMembership(clubId, targetMembership);
-
-        ClubMembershipDto modifiedMembership = clubService.findMembershipIn(clubId, targetMembership.getMemberEmail());
-        narrator.sayln("\t > 멤버십 관련 정보를 찾았습니다 : " + modifiedMembership);
-
-    }
-
-    public void remove(){
-
-        if(!hasCurrentClub()){
-            narrator.sayln("지정된 클럽이 아직 없습니다. 클럽을 먼저 지정해주세요 . ");
-            return;
-        }
-
-        ClubMembershipDto targetMembership = findOne();
-        if(targetMembership == null){
-            return;
-        }
-
-        String confirmStr = consoleUtil.getValueOf("이 멤버를 클럽에서 제거하시겠습니까??? (Y: yes N : no)");
-
-        if(confirmStr.toLowerCase().equals("y") || confirmStr.toLowerCase().equals("yes")){
-            narrator.sayln("멤버십을 제거하는 중입니다 ..... " + targetMembership.getMemberEmail());
-            clubService.removeMembership(currentClub.getUsid(), targetMembership.getMemberEmail());
-        }else{
-            narrator.sayln("제거가 취소되었습니다. ------>" + targetMembership.getMemberEmail());
-        }
-
-    }
+		String confirmStr = consoleUtil.getValueOf("Remove this member in the club? (Y:yes, N:no)");
+		if (confirmStr.toLowerCase().equals("y") || confirmStr.toLowerCase().equals("yes")) {
+			//
+			narrator.sayln("Removing a membership -->" + targetMembership.getMemberEmail());
+			clubService.removeMembership(currentClub.getUsid(), targetMembership.getMemberEmail());
+		} else {
+			narrator.sayln("Remove cancelled, the member is safe. --> " + targetMembership.getMemberEmail());
+		}
+	}
 }

@@ -5,84 +5,90 @@ import javastory.club.stage3.step1.entity.club.RoleInClub;
 import javastory.club.stage3.util.DateUtil;
 
 public class ClubMembershipDto {
+	//
+	private String clubId;
+	private String memberEmail;
+	private RoleInClub role;
+	private String joinDate;
 
-    private String clubId;
-    private String memberEmail;
-    private RoleInClub role;
-    private String joinDate;
+	private ClubMembershipDto() {
+		//
+		this.role = RoleInClub.Member;
+		this.joinDate = DateUtil.today();
+	}
 
-    private ClubMembershipDto(){
-        this.role = RoleInClub.Member;
-        this.joinDate = DateUtil.today();
-    }
+	public ClubMembershipDto(String clubId, String memberEmail) {
+		//
+		this();
+		this.clubId = clubId;
+		this.memberEmail = memberEmail;
+	}
 
-    public ClubMembershipDto(String clubId, String memberEmail){
+	public ClubMembershipDto(TravelClubDto clubDto, MemberDto memberDto) {
+		//
+		this();
+		this.clubId = clubDto.getUsid();
+		this.memberEmail = memberDto.getEmail();
+	}
 
-        this();
-        this.clubId = clubId;
-        this.memberEmail = memberEmail;
-    }
+	public ClubMembershipDto(ClubMembership membership) {
+		//
+		this.clubId = membership.getClubId();
+		this.memberEmail = membership.getMemberEmail();
+		this.role = membership.getRole();
+		this.joinDate = membership.getJoinDate();
+	}
 
-    public ClubMembershipDto(TravelClubDto clubDto, MemberDto memberDto){
+	public ClubMembership toMembership() {
+		//
+		ClubMembership membership = new ClubMembership(clubId, memberEmail);
+		membership.setRole(role);
+		membership.setJoinDate(joinDate);
+		return membership;
+	}
 
-    }
+	@Override
+	public String toString() {
+		// 
+		StringBuilder builder = new StringBuilder();
 
-    public ClubMembershipDto(ClubMembership membership){
+		builder.append("club Id:").append(clubId);
+		builder.append(", member email:").append(memberEmail);
+		builder.append(", role:").append(role.name());
+		builder.append(", join date:").append(joinDate);
 
-        this.clubId = membership.getClubId();
-        this.memberEmail = membership.getMemberEmail();
-        this.role = membership.getRole();
-        this.joinDate = membership.getJoinDate();
-    }
+		return builder.toString();
+	}
 
-    public ClubMembership toMembership(){
-        ClubMembership membership = new ClubMembership(clubId,memberEmail);
-        membership.setRole(role);
-        membership.setJoinDate(joinDate);
-        return membership;
-    }
+	public String getClubId() {
+		return clubId;
+	}
 
-    @Override
-    public String toString() {
+	public void setClubId(String clubId) {
+		this.clubId = clubId;
+	}
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("club Id:").append(clubId);
-        sb.append(", member email:").append(memberEmail);
-        sb.append(", role:").append(role.name());
-        sb.append(", join date:").append(joinDate);
+	public String getMemberEmail() {
+		return memberEmail;
+	}
 
-        return sb.toString();
-    }
+	public void setMemberEmail(String memberEmail) {
+		this.memberEmail = memberEmail;
+	}
 
-    public String getClubId() {
-        return clubId;
-    }
+	public RoleInClub getRole() {
+		return role;
+	}
 
-    public void setClubId(String clubId) {
-        this.clubId = clubId;
-    }
+	public void setRole(RoleInClub role) {
+		this.role = role;
+	}
 
-    public String getMemberEmail() {
-        return memberEmail;
-    }
+	public String getJoinDate() {
+		return joinDate;
+	}
 
-    public void setMemberEmail(String memberEmail) {
-        this.memberEmail = memberEmail;
-    }
-
-    public RoleInClub getRole() {
-        return role;
-    }
-
-    public void setRole(RoleInClub role) {
-        this.role = role;
-    }
-
-    public String getJoinDate() {
-        return joinDate;
-    }
-
-    public void setJoinDate(String joinDate) {
-        this.joinDate = joinDate;
-    }
+	public void setJoinDate(String joinDate) {
+		this.joinDate = joinDate;
+	}
 }

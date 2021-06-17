@@ -1,85 +1,89 @@
 package javastory.club.stage3.step3.ui.menu;
 
+import java.util.Scanner;
+
 import javastory.club.stage3.util.Narrator;
 import javastory.club.stage3.util.TalkingAt;
 
-import java.util.Scanner;
-
 public class MainMenu {
+	//
+	private ClubMenu clubMenu;
+	private MemberMenu memberMenu;
+	private BoardMenu boardMenu;
+	
+	private Scanner scanner;
+	private Narrator narrator; 
 
-    private ClubMenu clubMenu;
-    private MemberMenu memberMenu;
-    private BoardMenu boardMenu;
+	public MainMenu() {
+		//
+		this.clubMenu = new ClubMenu();
+		this.memberMenu = new MemberMenu();
+		this.boardMenu = new BoardMenu();
+		
+		this.scanner = new Scanner(System.in);
+		this.narrator = new Narrator(this, TalkingAt.Left); 
+	}
 
-    private Scanner sc;
-    private Narrator narrator;
+	public void show() {
+		//
+		int inputNumber = 0;
 
-    public MainMenu() {
-        this.clubMenu = new ClubMenu();
-        this.memberMenu = new MemberMenu();
-        this.boardMenu = new BoardMenu();
-        this.sc = new Scanner(System.in);
-        this.narrator = new Narrator(this, TalkingAt.Left);
-    }
+		while (true) {
+			displayMenu();
+			inputNumber = selectMenu();
 
-    public void show(){
+			switch (inputNumber) {
+			//
+			case 1:
+				clubMenu.show();
+				break;
+			case 2:
+				memberMenu.show(); 
+				break;
+			case 3:
+				boardMenu.show(); 
+				break;
+			case 0:
+				this.exitProgram();
 
-        int inputNum = 0;
+			default:
+				narrator.sayln("Choose again!");
+			}
+		}
+	}
 
-        while(true){
-            displayMenu();
-            inputNum = selectMenu();
+	private void displayMenu() {
+		//
+		narrator.sayln("");
+		narrator.sayln("..............................");
+		narrator.sayln(" Main menu ");
+		narrator.sayln("..............................");
+		narrator.sayln(" 1. Club menu");
+		narrator.sayln(" 2. Member menu");
+		narrator.sayln(" 3. Board menu");
+		narrator.sayln("..............................");
+		narrator.sayln(" 0. Exit program");
+		narrator.sayln("..............................");
+	}
 
-            switch(inputNum){
-                case 1:
-                    clubMenu.show();
-                    break;
-                case 2:
-                    memberMenu.show();
-                    break;
-                case 3:
-                    boardMenu.show();
-                    break;
-                case 0 :
-                    this.exitProgram();
-                default:
-                    narrator.sayln("다시 입력해주세요.");
-            }
-        }
-    }
+	private int selectMenu() {
+		//
+		System.out.print("Select: ");
+		int menuNumber = scanner.nextInt();
 
-    private void displayMenu(){
-
-        narrator.sayln(System.lineSeparator());
-        narrator.sayln("-------------------------");
-        narrator.sayln("메인 메뉴");
-        narrator.sayln("-------------------------");
-        narrator.sayln(" 1. Club menu");
-        narrator.sayln(" 2. Member menu");
-        narrator.sayln(" 3. Board menu");
-        narrator.sayln("-------------------------");
-        narrator.sayln(" 0. Exit program");
-        narrator.sayln("-------------------------");
-
-    }
-
-    private int selectMenu(){
-        narrator.say("select : ");
-        int inputNum = sc.nextInt();
-
-        if(inputNum >= 0 && inputNum <= 3){
-            sc.nextLine();
-            return inputNum;
-        }else{
-            narrator.sayln("잘못 입력하셨습니다...");
-            return -1;
-        }
-    }
-
-    private void exitProgram(){
-        narrator.sayln("프로그램을 종료합니다 ......");
-        sc.close();
-        System.exit(0);
-    }
-
+		if (menuNumber >= 0 && menuNumber <= 3) {
+			scanner.nextLine();
+			return menuNumber;
+		} else {
+			narrator.sayln("It's a invalid number --> " + menuNumber);
+			return -1;
+		}
+	}
+	
+	private void exitProgram() {
+		//
+		narrator.sayln("Program exit. Bye...");
+		scanner.close();
+		System.exit(0);
+	}	
 }

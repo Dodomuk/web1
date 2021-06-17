@@ -1,111 +1,115 @@
 package javastory.club.stage3.step3.service.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javastory.club.stage3.step1.entity.club.ClubMembership;
 import javastory.club.stage3.step1.entity.club.TravelClub;
 import javastory.club.stage3.util.DateUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 public class TravelClubDto {
+	//
+	private String usid;
+	private String name;
+	private String intro;
+	private String foundationDay;
 
-    private String usid;
-    private String name;
-    private String intro;
-    private String foundationDay;
+	private List<ClubMembershipDto> membershipList;
 
-    private List<ClubMembershipDto> membershipList;
+	private TravelClubDto() {
+		//
+		this.membershipList = new ArrayList<ClubMembershipDto>();
+	}
 
-    public TravelClubDto() {
-        this.membershipList = new ArrayList<>();
-    }
+	public TravelClubDto(String name, String intro) {
+		//
+		this();
+		this.name = name;
+		this.intro = intro;
+		this.foundationDay = DateUtil.today();
+	}
 
-    public TravelClubDto(String name, String intro) {
-        this();
-        this.name = name;
-        this.intro = intro;
-        this.foundationDay = DateUtil.today();
-    }
+	public TravelClubDto(TravelClub club) {
+		//
+		this();
+		usid = club.getUsid();
+		name = club.getName();
+		intro = club.getIntro();
+		foundationDay = club.getFoundationDay();
 
-    public TravelClubDto(TravelClub club){
-        this();
-        usid = club.getUsid();
-        name = club.getName();
-        intro = club.getIntro();
-        foundationDay = club.getFoundationDay();
+		for (ClubMembership membership : club.getMembershipList()) {
+			//
+			membershipList.add(new ClubMembershipDto(membership));
+		}
+	}
 
-        for (ClubMembership clubMembership : club.getMembershipList()) {
-            membershipList.add(new ClubMembershipDto(clubMembership));
-        }
-    }
+	public TravelClub toTravelClub() {
+		//
+		TravelClub travelClub = new TravelClub(name, intro);
+		travelClub.setUsid(usid);
+		travelClub.setFoundationDay(foundationDay);
 
-    public TravelClub toTravelClub(){
-        TravelClub travelClub = new TravelClub(name,intro);
-        travelClub.setUsid(usid);
-        travelClub.setFoundationDay(foundationDay);
+		for (ClubMembershipDto membershipDto : membershipList) {
+			//
+			travelClub.getMembershipList().add(membershipDto.toMembership());
+		}
+		return travelClub;
+	}
 
-        for (ClubMembershipDto clubMembershipDto : membershipList) {
-            travelClub.getMembershipList().add(clubMembershipDto.toMembership());
-        }
-        return travelClub;
-    }
+	@Override
+	public String toString() {
+		//
+		StringBuilder builder = new StringBuilder();
 
-    @Override
-    public String toString() {
+		builder.append("Travel Club Id:").append(usid);
+		builder.append(", name:").append(name);
+		builder.append(", intro:").append(intro);
+		builder.append(", foundation day:").append(foundationDay);
 
-        StringBuilder sb = new StringBuilder();
+		int i = 0;
 
-        sb.append("Travel Club Id : ").append(usid);
-        sb.append(", name : ").append(name);
-        sb.append(", intro : ").append(intro);
-        sb.append(", foundation Day : ").append(foundationDay);
+		for (ClubMembershipDto membership : membershipList) {
+			builder.append(" ["+ i +"] Club member ").append(membership.toString()).append("\n");
+			i++;
+		}
 
-        int i = 0;
+		return builder.toString();
+	}
 
-        for (ClubMembershipDto clubMembershipDto : membershipList) {
-            sb.append("[" + i + "] club member ").append(clubMembershipDto.toString()).append("\n");
-            i++;
-        }
+	public String getUsid() {
+		return usid;
+	}
 
-        return sb.toString();
+	public void setUsid(String usid) {
+		//
+		this.usid = usid;
+	}
 
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getUsid() {
-        return usid;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setUsid(String usid) {
-        this.usid = usid;
-    }
+	public String getIntro() {
+		return intro;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setIntro(String intro) {
+		this.intro = intro;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getFoundationDay() {
+		return foundationDay;
+	}
 
-    public String getIntro() {
-        return intro;
-    }
+	public void setFoundationDay(String foundationDay) {
+		this.foundationDay = foundationDay;
+	}
 
-    public void setIntro(String intro) {
-        this.intro = intro;
-    }
-
-    public String getFoundationDay() {
-        return foundationDay;
-    }
-
-    public void setFoundationDay(String foundationDay) {
-        this.foundationDay = foundationDay;
-    }
-
-    public List<ClubMembershipDto> getMembershipList() {
-        return membershipList;
-    }
-
+	public List<ClubMembershipDto> getMembershipList() {
+		return membershipList;
+	}
 }

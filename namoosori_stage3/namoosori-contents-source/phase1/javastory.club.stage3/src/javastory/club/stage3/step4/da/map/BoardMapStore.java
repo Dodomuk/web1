@@ -1,16 +1,19 @@
 package javastory.club.stage3.step4.da.map;
 
-import javastory.club.stage3.step1.entity.board.SocialBoard;
-import javastory.club.stage3.step3.util.BoardDuplicationException;
-import javastory.club.stage3.step4.da.map.io.MemoryMap;
-import javastory.club.stage3.step4.store.BoardStore;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class BoardMapStore implements BoardStore {
+import javastory.club.stage3.step1.entity.board.SocialBoard;
+import javastory.club.stage3.step4.da.map.io.MemoryMap;
+import javastory.club.stage3.step4.store.BoardStore;
+import javastory.club.stage3.step4.util.MemberDuplicationException;
+import javastory.club.stage3.step4.util.NoSuchBoardException;
+
+import javax.swing.text.html.Option;
+
+public class BoardMapStore implements BoardStore{
 
     private Map<String, SocialBoard> boardMap;
 
@@ -20,10 +23,11 @@ public class BoardMapStore implements BoardStore {
 
     @Override
     public String create(SocialBoard board) {
+
         Optional.ofNullable(boardMap.get(board.getId()))
-                .ifPresent(targetBoard -> {
-                    throw new BoardDuplicationException("해당 이메일 관련 게시판이 이미 존재합니다." + board.getName());
+                .ifPresent(socialBoard -> {throw new NoSuchBoardException("해당 클럽 아이디의 게시판이 이미 존재합니다.");
                 });
+
         boardMap.put(board.getId(),board);
 
         return board.getId();
@@ -35,17 +39,16 @@ public class BoardMapStore implements BoardStore {
     }
 
     @Override
-    public List<SocialBoard> retrieveByName(String name) {
-
+    public List<SocialBoard> retrieveByName(String boardId) {
         return boardMap.values().stream()
-                .filter(foundBoard -> foundBoard.getName().equals(name))
+                .filter(socialBoard -> socialBoard.getId().equals(boardId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void update(SocialBoard board) {
 
-        boardMap.put(board.getId(),board);
+        boardMap.put(board.getId() ,board);
 
     }
 
@@ -53,11 +56,11 @@ public class BoardMapStore implements BoardStore {
     public void delete(String boardId) {
 
         boardMap.remove(boardId);
-
     }
 
     @Override
     public boolean exists(String boardId) {
-        return Optional.ofNullable(boardMap.get(boardId)).isPresent();
+        return Optional.ofNullable(boardMap.get(boardId))
+                .isPresent();
     }
 }
