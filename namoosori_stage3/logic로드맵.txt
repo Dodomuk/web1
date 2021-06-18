@@ -1,0 +1,129 @@
+***logic 로드맵***
+
+boardServiceLogic : 
+
+//register
+-게시판 존재중복여부
+-게시판 관련 클럽 연결됐는지 여부
+
+-이메일을 가진 멤버가 클럽에 있는지 확인 여부 // 있을 경우 create
+
+//find
+-socialboard를 받는 빈 list 생성
+-list null값 여부
+-stream을 통해 boardDto로 된 list로 변환
+
+//findByClubName
+-해당 이름의 게시판 존재여부 // 존재할시에 BoardDto로 변환 및 객체 생성
+
+//modify
+-게시판 관련 아이디 존재여부 // 있을시 SocialBoard 타입의 객체 생성
+-나머지 값들 비어 있는지 확인 // 비어있을 경우 기존의 값 대체
+- update
+
+//remove
+-게시판이 존재하는지 여부 확인
+-delete
+
+==========
+
+ClubServiceLogic:
+[club]
+//register
+-해당 이름 관련 club이 존재하는지에 대한 여부
+-TravelClub으로 변환
+-create
+-clubId 리턴
+
+//findClub
+-클럽 관련 아이디 존재 유무 확인 // 있을시 변환 후 리턴
+
+//findClubByName
+-클럽 관련 이름 존재 유무 확인 // 있을시 변환 후 리턴
+
+//modify
+-클럽 이름 중복 확인 
+-클럽이 존재하는지 아이디로 확인
+-name / intro 유무 확인 없을 시 기존 값으로 대체
+-update
+
+//remove
+-clubId가 없을 경우 예외처리
+-delete
+
+[membership]
+//addMembership
+-멤버가 존재하는지 이메일(이메일 = primary  key) 확인
+-멤버십이 클럽에 존재하는지 확인 // 이미 존재할 경우 예외처리
+-ClubMembership으로 타입 변환 후 멤버십 리스트에 저장(clubStore,memberStore 둘 다)
+
+//getMembershipIn 메소드 하나 따로 만들기(Travel club, String memberEmail)
+-foreach문을 통해 멤버의 이메일과 멤버십의 멤버 이메일 중 같은게 있는지 확인
+-있을 경우 해당 맴버십 리턴
+-없을 경우 예외
+
+//findMembershipIn
+-getMembershipIn을 통해 해당 이메일을 가진 멤버를 불러옴
+-메소드에 주어진 형식으로 변환 후 리턴
+ 
+//findAllMembershipIn
+-stream을 통해 멤버십dto 변환 후 리스트로 리턴
+
+//modifyMembership (role만 바뀜)
+-getMembershipIn을 통해 클럽멤버십 객체 생성
+-role다시 새로 넣어줌
+-넣어준 role  clubMembership 그리고 list에서 각자 새로 넣고 update
+-여기 좀 다시 봐야될듯?
+
+//removeMembership
+-store에서 삭제할 클럽과 멤버 관련 객체 소환 // 클럽 멤버쉽 객체 생성
+-remove로 club , member 둘 다 리스트에서 제거
+
+
+=======
+MemberServiceLogic
+
+//register
+-해당 이메일 관련 멤버가 존재하는지 확인
+-없을 경우 create
+
+//find
+-email 관련 멤버가 존재하는지 확인, 있을 경우 리턴 타입으로 변환 후 리턴
+
+//findByName
+-커뮤니티멤버들이 있는 list 객체 생성
+-비어있을 경우 없다고 예외처리
+-stream으로 list 변환 후 리턴
+
+//modify
+-해당 멤버가 존재하는지 확인 //새로운 객체로 타깃멤버 저장
+-입력 값이 없을 경우 기존 값으로 대체(이메일을 제외한 나머지 값 전부)
+-update
+
+//remove
+-멤버가 존재할 경우 delete
+
+========
+PostingServiceLogic
+
+//register
+-클럽에 멤버가 존재하는지 (이메일로 확인하면됨)
+-게시판에 id 관련 게시판이 존재하는지 // 있을 경우 posting으로 변환 후 create
+
+//find
+-해당 id 관련 posting이 존재하는지 // 존재할 경우 dto로 객체 생성 후 반환
+
+//findByBoardId
+-아이디 관련 게시판이 존재하는지 체크
+-postingDto 로 변환 후 list로 리턴
+
+//modify
+-아이디 관련 포스팅이 존재하는지 확인 후 저장 
+-title이랑 contents 비어있는지 확인 후 비어있을 경우 기ㅏ존 값으로 대체
+-update
+
+//remove
+-아이디 관련 포스팅이 존재하는지 확인 / 존재할 경우 삭제
+
+//removeAllIn
+-stream의 foreach문을 통해 해당 값 전부 삭제
