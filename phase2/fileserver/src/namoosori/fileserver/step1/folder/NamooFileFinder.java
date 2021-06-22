@@ -7,40 +7,35 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class NamooFileFinder {
-	//
-	
-	public NamooFile find(String folderName, String fileName) {
-		//
-		return NamooFile.getFile(folderName, fileName);
-	}
-	
-	public NamooFile find(String[] folderPaths, String fileName) {
-		//
-		
-		String pathName = null;
-		
-		try {
-			String cannonicalPath = (new File(".")).getCanonicalPath();
-		    String fileSeparator = System.getProperty("file.separator"); 
 
-		    StringBuilder builder = new StringBuilder();
-		    builder.append(cannonicalPath).append(fileSeparator);
-		    
-		    for (String path: folderPaths) {
-		    	builder.append(path).append(fileSeparator);
-		    }
-		    pathName = builder.toString();
+    public NamooFile find(String folderName, String fileName){
+        return NamooFile.getFile(folderName,fileName);
+    }
 
-		    
-			Path path = Paths.get(pathName); 
-	        if (!Files.exists(path)) {
+    public NamooFile find(String[] folderPaths, String fileName){
+
+        String pathName = null;
+
+        try {
+            String cannonicalPath = (new File(".")).getCanonicalPath();
+            String fileSeparator = System.getProperty("file.separator");
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(cannonicalPath).append(fileSeparator);
+
+            for (String folderPath : folderPaths) {
+               sb.append(folderPath).append(fileSeparator);
+            }
+
+            pathName = sb.toString();
+
+            Path path = Paths.get(pathName);
+            if(!Files.exists(path)){
                 Files.createDirectories(path);
-	        }
-	        
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return NamooFile.getFile(pathName, fileName);
-	}
-
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NamooFile.getFile(pathName,fileName);
+    }
 }

@@ -1,9 +1,10 @@
 package namoosori.fileserver.step2.context;
 
 public enum FileCommand {
-	//
-	Store,
-	Delete,
-	Find, 
-	ListFiles; 
+
+    Store,
+    Delete,
+    Find,
+    ListFiles;
+
 }

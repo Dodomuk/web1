@@ -36,7 +36,7 @@ public class ResponseMessage {
 		// 
 		return (new Gson()).fromJson(json, ResponseMessage.class); 
 	}
-	
+
 	public static ResponseMessage getSample() {
 		// 
 		return new ResponseMessage("setBaseTime", "10"); 

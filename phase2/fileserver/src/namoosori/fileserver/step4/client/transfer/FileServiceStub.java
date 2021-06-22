@@ -1,13 +1,7 @@
 package namoosori.fileserver.step4.client.transfer;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import namoosori.fileserver.step4.context.FileCommand;
 import namoosori.fileserver.step4.context.FileContext;
 import namoosori.fileserver.step4.context.FileService;
@@ -15,6 +9,11 @@ import namoosori.fileserver.util.DispatchFailException;
 import namoosori.fileserver.util.FileUtil;
 import namoosori.fileserver.util.RequestMessage;
 import namoosori.fileserver.util.ResponseMessage;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileServiceStub implements FileService {
 	//

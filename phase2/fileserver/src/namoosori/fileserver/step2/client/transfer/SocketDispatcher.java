@@ -1,69 +1,65 @@
 package namoosori.fileserver.step2.client.transfer;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import namoosori.fileserver.util.DispatchFailException;
 import namoosori.fileserver.util.RequestMessage;
 import namoosori.fileserver.util.ResponseMessage;
 import namoosori.fileserver.util.SocketWorker;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 public class SocketDispatcher {
-	//
-	private static final int TIME_OUT_IN_SECONDS = 3; 
-	
-	private SocketWorker socketWorker;
-	
-	private SocketDispatcher(String serverIp, int listeningPort) {
-		//
-		this.socketWorker = createSocketWorker(serverIp, listeningPort);
-	}
 
-	public static SocketDispatcher getInstance(String ip, int port) {
-		return (new SocketDispatcher(ip, port)); 
-	}
+    private static final int TIME_OUT_IN_SECONDS = 3;
 
-	public void close() {
-		this.socketWorker.closeSocket(); 
-	}
-	
-	public ResponseMessage dispatchReturn(RequestMessage message) throws IOException {
-		//
-		socketWorker.writeMessage(message.toJson());
-		String json = socketWorker.readMessage();
-		
-		return ResponseMessage.fromJson(json); 
-	}
+    private SocketWorker socketWorker;
 
-	public void dispatchVoid(RequestMessage message) throws IOException {
-		//
-		socketWorker.writeMessage(message.toJson());
-	}
+    private SocketDispatcher(String serverIp, int listeningPort){
+        this.socketWorker = createSocketWorker(serverIp,listeningPort);
+    }
 
-	private  SocketWorker createSocketWorker(String serverIp, int listeningPort) {
-		//
-		Socket socket = this.prepareSocket(serverIp, listeningPort);
-		return (new SocketWorker(socket));
-	}
+    public static SocketDispatcher getInstance(String ip, int port) {
+        return new SocketDispatcher(ip,port);
+    }
 
-	private Socket prepareSocket(String serverIp, int listeningPort) {
-		//
-		Socket socket = null; 
-		try {
-			socket = new Socket();			// Can't assign requested address
-			socket.setSoLinger(true, 0); 	// Can't assign requested address
-			socket.setReuseAddress(true);
-			InetSocketAddress d = new InetSocketAddress(serverIp, listeningPort);
-			socket.connect(d, TIME_OUT_IN_SECONDS*1000); //connect() : endpoint와 timeout 시간 설정 , InetSocketAddress() : host주소와 port주소를 통해 새로운 소켓 생성
-		} catch (UnknownHostException e) {
-			throw new DispatchFailException(e.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new DispatchFailException(e.getMessage());
-		} 
-		
-		return socket; 
-	}
+    public void close(){
+        this.socketWorker.closeSocket();
+    }
+
+    public ResponseMessage dispatchReturn(RequestMessage message) throws IOException{
+
+        socketWorker.writeMessage(message.toJson());
+        String json = socketWorker.readMessage();
+
+        return ResponseMessage.fromJson(json);
+    }
+
+    public void dispatchVoid(RequestMessage message) throws IOException{
+        socketWorker.writeMessage(message.toJson());
+    }
+
+    private SocketWorker createSocketWorker(String serverIp, int listeningPort){
+        Socket socket = this.prepareSocket(serverIp,listeningPort);
+        return (new SocketWorker(socket));
+    }
+
+    private Socket prepareSocket(String serverIp, int listeningPort){
+        Socket socket = null;
+
+        try {
+            socket = new Socket();
+            socket.setSoLinger(true,0);
+            socket.setReuseAddress(true);
+            socket.connect(new InetSocketAddress(serverIp,listeningPort), TIME_OUT_IN_SECONDS*1000);
+        }catch(UnknownHostException e){
+            throw new DispatchFailException(e.getMessage());
+        } catch (IOException e) {
+           throw new DispatchFailException(e.getMessage());
+        }
+        return socket;
+
+    }
+
 }

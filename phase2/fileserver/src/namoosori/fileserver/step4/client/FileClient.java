@@ -1,11 +1,11 @@
 package namoosori.fileserver.step4.client;
 
-import java.io.File;
-
 import namoosori.fileserver.step4.client.transfer.FileServiceStub;
 import namoosori.fileserver.step4.context.FileContext;
 import namoosori.fileserver.step4.context.FileService;
 import namoosori.fileserver.util.FileUtil;
+
+import java.io.File;
 
 public class FileClient extends Thread {
 	//

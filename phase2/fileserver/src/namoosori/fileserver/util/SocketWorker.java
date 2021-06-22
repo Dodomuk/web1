@@ -9,13 +9,14 @@ public class SocketWorker {
 	//
 	private static final String DEFAULT_CHAR_SET = "UTF-8"; 
 	public static final int HEADER_LENGTH = 4; 
-	private static int MAX_READ_WRITE_LENGTH = (1024 * 1024 * 10); 
+	private static int MAX_READ_WRITE_LENGTH = (1024 * 1024 * 10); //10MB
 
+	//스트림은 단방향 통신을 한다는 특징이 있다. 하나의 스트림으로 입출력을 동시에 진행 할 수 없기 때문에 입력스트림과 출력스트림을 따로 만들어줘야한다.
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	
-	private Socket socket;
-	
+	private Socket socket; //AutoCloseable 인터페이스를 implements 하고 있다. ==> 자동으로 닫아줌
+
 	public SocketWorker(Socket socket) {
 		//
 		this.socket = socket;		
@@ -47,7 +48,8 @@ public class SocketWorker {
 			int bodyLength = ByteUtil.toInt(headerBytes);
 			byte[] bodyBytes = read(bodyLength); 
 			
-			resultMessage = new String(bodyBytes, DEFAULT_CHAR_SET);
+			resultMessage = new String(bodyBytes, DEFAULT_CHAR_SET); //deprecated(완벽하게 bytes를 characters 타입으로 변환해주지 못함)
+			                                                         // 다른 방법을 찾아보자!
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ReactFailException("Fail to read message. --> " + e.getMessage()); 
@@ -67,7 +69,7 @@ public class SocketWorker {
 		return !socket.isClosed();
 	}
 	
-	public byte[] getReqisterIp() {
+	public byte[] getReqeusterIp() {
 		//
 		return socket.getInetAddress().getAddress();
 	}
@@ -88,9 +90,9 @@ public class SocketWorker {
 			if (readCount > 0) {
 				allReadCount += readCount;
 			} else if (readCount == -1) {
-				throw new ReactFailException("Read EOF.") ; //end of file
+				throw new ReactFailException("Read EOF.") ;
 			} else if (readCount == 0 && ++retryCount == 20) {
-				throw new ReactFailException("Retried more than 20 times.") ;
+				throw new ReactFailException("Retry more than 20 times.") ;
 			}
 		}
 		return readBuffer;

@@ -20,7 +20,7 @@ public class RequestMessage {
 		StringBuilder builder = new StringBuilder(); 
 		
 		builder.append("Service name:").append(serviceName); 
-		builder.append(", vlaue:").append(value);
+		builder.append(", value:").append(value);
 		builder.append(", remark:").append(remark);
 		
 		return builder.toString(); 

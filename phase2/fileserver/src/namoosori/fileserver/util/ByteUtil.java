@@ -58,7 +58,7 @@ public class ByteUtil {
 		}
 
 		return (int) (
-			(int) (0xff & intBytes[0]) << 24 | 
+			(int) (0xff & intBytes[0]) << 24 |
 			(int) (0xff & intBytes[1]) << 16 | 
 			(int) (0xff & intBytes[2]) << 8  | 
 			(int) (0xff & intBytes[3]) << 0

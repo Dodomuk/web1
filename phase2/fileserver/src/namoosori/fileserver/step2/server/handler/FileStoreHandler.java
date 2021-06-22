@@ -1,20 +1,20 @@
 package namoosori.fileserver.step2.server.handler;
 
-import java.nio.file.FileAlreadyExistsException;
-
 import namoosori.fileserver.step2.server.repo.FileStore;
 import namoosori.fileserver.util.RequestMessage;
 import namoosori.fileserver.util.ResponseMessage;
 
+import java.nio.file.FileAlreadyExistsException;
+
 public class FileStoreHandler implements FileHandler {
-	//
+
 	public FileStoreHandler() {
-		// 
+
 	}
 
 	@Override
 	public ResponseMessage handle(RequestMessage request) {
-		// 
+
 		FileStore fileStore = getFileStore();
 		char[] contents = request.getValue().toCharArray();
 		String fileName = request.getRemark(); 
@@ -24,7 +24,7 @@ public class FileStoreHandler implements FileHandler {
 			fileStore.writeFile(fileName, contents);
 			response = new ResponseMessage(request.getServiceName(), fileName); 
 		} catch (FileAlreadyExistsException e) {
-			// 
+
 			e.printStackTrace();
 			response = new ResponseMessage(request.getServiceName(), fileName); 
 			response.setSuccess(false);
@@ -35,7 +35,7 @@ public class FileStoreHandler implements FileHandler {
 	}
 
 	public FileStore getFileStore() {
-		// 
+
 		return FileStore.newInstance(); 
 	}
 }

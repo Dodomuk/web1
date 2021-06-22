@@ -1,13 +1,12 @@
 package namoosori.fileserver.step4.server.handler;
 
-import java.util.List;
-import java.util.StringTokenizer;
-
 import com.google.gson.Gson;
-
 import namoosori.fileserver.step4.server.repo.FileStore;
 import namoosori.fileserver.util.RequestMessage;
 import namoosori.fileserver.util.ResponseMessage;
+
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class FileListHandler implements FileHandler {
 	//

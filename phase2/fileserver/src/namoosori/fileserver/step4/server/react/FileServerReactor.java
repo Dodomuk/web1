@@ -1,10 +1,10 @@
 package namoosori.fileserver.step4.server.react;
 
+import namoosori.fileserver.util.ReactFailException;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import namoosori.fileserver.util.ReactFailException;
 
 public class FileServerReactor extends Thread {
 	//

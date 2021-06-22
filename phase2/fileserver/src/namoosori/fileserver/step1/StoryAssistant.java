@@ -1,33 +1,26 @@
-/*
- * COPYRIGHT (c) NEXTREE Consulting 2014
- * This software is the proprietary of NEXTREE Consulting CO.  
- * 
- * @author <a href="mailto:tsong@nextree.co.kr">Song, Taegook</a>
- * @since 2014. 6. 10.
- */
-
 package namoosori.fileserver.step1;
+
 
 import namoosori.fileserver.step1.folder.FileStore;
 
 public class StoryAssistant {
-	//
-	public static void main(String[] args) {
-		// 
-		showDemo(); 
-	}
-	
-	private static void showDemo() {
-		//
-		String folderName = "FileRepository"; 
-		String fileName = "TestFile000001.txt"; 
-		String contents = "Hello, file server."; 
-		
-		FileStore folder = new FileStore(folderName);
-		folder.writeFile(fileName, contents.toCharArray());
-		
-		char[] resultContents = folder.readFile(fileName);
-		
-		System.out.println(String.valueOf(resultContents)); 
-	}
+
+    public static void main(String[] args) {
+        show();
+    }
+
+    private static void show(){
+        String folderName = "FileRepository";
+        String fileName = "TestFile000003.txt";
+        String contents = "안녕하세요. 저는 정동묵이라고 합니다.";
+
+        FileStore folder = new FileStore(folderName);
+
+        folder.writeFile(fileName,contents.toCharArray());
+
+        char[] result = folder.readFile(fileName);
+
+        System.out.println(String.valueOf(result));
+    }
+
 }
