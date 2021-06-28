@@ -1,0 +1,22 @@
+#4
+
+
+라우터와 큐의 갯수 직접 설정
+
+라우터 갯수를 10개로 지정. 
+
+소켓이 할당된 ArrayBlockingQueue의 최대치 지정(100)
+(add() , take()를 통해 queue 안에 담긴 소켓 자유롭게 사용)
+
+FileServerReactor에서 serverSocket.accept()된 소켓을 seq와 함께 
+eventQueue에 add
+-------->
+EventRouter에서 eventQueue의 head에 담긴
+소켓을 꺼내 readMessage() => writeMessage() => closeSocket()
+
+처리 시간:
+4.485750
+6.855000
+9.444000
+13.033857
+17.874091

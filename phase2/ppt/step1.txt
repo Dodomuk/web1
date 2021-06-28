@@ -1,0 +1,7 @@
+#1
+
+StoryAssistant.java showDemo() -> FileStore(folderName)
+file write (writeFile(fileName, contents.toCharArray())
+file read (readFile(fileName)) <char 배열로 변환해서 읽음>
+=> System.out.println(컨텐츠);
+
