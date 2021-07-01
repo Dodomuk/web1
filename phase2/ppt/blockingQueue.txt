@@ -1,0 +1,32 @@
+LinkedBlockingQueue
+ArrayBlockingQueue
+
+공통점 : FIFO 순서
+꺼낼때는 head 넣을 때는 tail
+
+차이점 :
+
+ArrayBlockingQueue
+배열 형태로 저장
+Array 기반이기 때문에 capacity를 최초에 지정
+Queue가 꽉 찬 상태에서 put 할 경우 넣을 수 있을 때까지 block
+Queue가 비어있는 경우에도 가져올 때 까지 block
+싱글락 형태(producer와 consumer가 락을 공유)
+
+LinkedBlockingQueue
+linked node 형태로 저장
+capacity를 지정할 수 있고 하지 않을 시 Integer.MAX_VALUE로 채워짐
+collections 프레임워크에 속하기 때문에 Collection / Iterator 인터페이스를 가진다.
+ArrayBlockingQueue보다 처리율(어떤 노드나 터미널에서부터 다른 터미널로 전달되는 단위,
+시간당 디지털 데이터 전송으로 처리하는 양)이 높다.
+더블락 형태(삽입과 삭제에 대한 락이 분리되어 있음)
+
+하나의 데이터(객체)마다 하나의 모니터를 결합할 수 있으며,
+모니터는 그것이 결합된 데이터가 동시에 두개 이상의 스레드에 의해 접근 할 수 없도록 막는 잠금 기능을 제공함
+으로서 동기화를 수행
+
+LinkedBlockingQueue의 경우 불공정성을 갖고 있기 때문에 새로운 큐에 자리가 생겼을 때 쓰레드가 새로
+들어오게 된다면 자원과 시간 낭비를 절약하기 위해 앞 서 대기 중이던 쓰레드들을 무시하고 먼저
+큐에 들어갈 수 있게 된다. 이렇게 계속 우선순위가 밀려 계속해서 자원을 할당 받지 못하는 쓰레드가 존재하는
+starvation 상태가 생길 수 있다.
+ ArrayBlockingQueue는 개발자의 필요에 따라 생성자의 인자를 통해 공정성을 설정해 이런 문제를 해결해 줄 수 있는 해결책이 될 수 있다. 

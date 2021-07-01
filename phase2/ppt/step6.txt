@@ -1,0 +1,15 @@
+쓰레드를 관리하는 pool 생성
+pool에서 라우터(쓰레드)를 10개로 제한해 운용.
+
+
+
+각 쓰레드는 ArrayBlockingQueue로 이루어져있기 
+때문에 동시성에 안전하며 synchronized가 없더라도
+사용이 가능. 
+
+현재 router에서 add로 추가하기 때문에
+queue가 꽉 차있을 경우 에러가 발생된다.
+
+
+
+

@@ -1,0 +1,19 @@
+FileUtil
+
+write : 매개변수로 넘어오는 file로 new FileWriter의 객체를 생성한다. FileWriter는 문자 기반 스트림으로 
+데이터를 파일에 저장할 때 사용되는데 현재는 문자열 형태로 값이 넘어오기 때문에 저장이 가능하다.
+
+read : inputStream으로 넘어온 파일의 텍스트를 읽고 buffer에 저장한 후 readLine() 메소드를 통해 
+한번에 읽어온다. 물론 buffer 없이도 외부 장치와의 데이터 입출력이 가능하지만, 
+중간에 메모리 버퍼를 통해 데이터를 한데 묶어 이동시켜 성능적으로 효율을 보이고 빠른 작업을 수행할 수 있다.
+파일에서 읽어온 값들은 character array 형식으로 변환해 return 된다.
+
+
+SocketWorker
+byte 단위로 변환해서 보내는 이유
+클라이언트 서버가 모두 java로 구현되어 있을 경우 그냥 object로 던져도 상관 없지만. java가 아닌
+C++의 경우 java의 object를 이해하지 못한다. 마찬가지로 Java 역시 C++의 구조체를 이해하지 못하기 때문에
+서로 byte단위로 정보를 주고 받아야 한다. 
+
+
+
