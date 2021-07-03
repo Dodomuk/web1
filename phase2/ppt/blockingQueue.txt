@@ -1,7 +1,8 @@
 LinkedBlockingQueue
 ArrayBlockingQueue
 
-공통점 : FIFO 순서
+공통점으로는 First in First Out, 선입선출이라는 queue자체의 특성을 갖고 있습니다.
+
 꺼낼때는 head 넣을 때는 tail
 
 차이점 :

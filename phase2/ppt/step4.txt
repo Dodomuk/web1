@@ -1,18 +1,19 @@
 #4
 
+스탭4부터는 쓰레드를 담은 Queue가 등장하게 됩니다. 
+Queue를 사용하게 됨으로서 프로세스에 대한 순차적인 처리가 가능해지게 됩니다.
+스택일 경우 후입선출 구조를 가지기 때문에 가장 먼저 들어간 작업부터 순서대로 처리하는
+FIFO 방식의 큐가 현재 작업에 더 잘 맞는 자료구조라고 생각합니다.
 
-라우터와 큐의 갯수 직접 설정
+라우터, 쓰레드의 개수는 10개로 지정되고. 
 
-라우터 갯수를 10개로 지정. 
+소켓과 시퀀스 번호가 할당된 ArrayBlockingQueue의 크기를 100으로 지정해
+add() , take()를 통해 queue 안에 담긴 소켓 자유롭게 사용됩니다.
 
-소켓이 할당된 ArrayBlockingQueue의 최대치 지정(100)
-(add() , take()를 통해 queue 안에 담긴 소켓 자유롭게 사용)
+특이사항으로는 ArrayBlockingQuee를 사용한 것인데 arrayBlcokingQUeue에서는
+고유 락을 가지고 있기 때문에 동기화를 명시하지 않아도 동시성을 해결해줄 수 있습니다.
 
-FileServerReactor에서 serverSocket.accept()된 소켓을 seq와 함께 
-eventQueue에 add
--------->
-EventRouter에서 eventQueue의 head에 담긴
-소켓을 꺼내 readMessage() => writeMessage() => closeSocket()
+그리고 현재 add를 사용해 큐로 값을 넣을 경우 큐의 크기가 작아졌을때 Queue full error가 발생하는데 이를 put으로 바꿔 실험해보았습니다. 자세한 내용은 뒤에서 다시 언급하겠습니다.
 
 처리 시간:
 4.485750
