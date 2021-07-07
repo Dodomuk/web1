@@ -1,0 +1,29 @@
+----------cmd
+
+mkdir todo-proj
+
+cd todo-proj
+
+npm install -g typescr
+
+tsc
+
+code .
+
+tsc --init :
+tscconfig.json 파일을 생성
+
+tsc
+
+npm init -y:
+package.json 파일 생성
+
+npm install nodemon concurrently:
+node_modules 폴더, package-lock.json 파일 생성
+
+package.json scripts에 
+"start:build":"tsc-w" 추가 ==> 타입스크립트를 컴파일할때
+콘솔에서 확인을 하겠다라는 의미.
+"start:run": "nodemon build/index.js"
+==> 시작할때 build의 index.js파일을 실행하겠다
+"start":"concurrently npm:start:*"
