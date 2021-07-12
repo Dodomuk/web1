@@ -1,7 +1,10 @@
 class TravelClub{
 
+    private _usid : string;
     private foundedDate : Date;
 
+    private _boardId : string;
+    private ClubMembership[];
     constructor(
         private name : string,
         private intro : string){

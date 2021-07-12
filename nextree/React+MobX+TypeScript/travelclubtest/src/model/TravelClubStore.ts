@@ -4,9 +4,11 @@ import memoryMap from "./MemoryMap";
 class TravelClubStore {
 
     private clubMap: any;
+    private autoIdMap : any;
 
     constructor() {
         this.clubMap = memoryMap.clubMap;
+        this.autoIdMap = memoryMap.autoIdMap;
     }
 
     count(): number {
@@ -14,9 +16,25 @@ class TravelClubStore {
     }
 
     create(newClub: TravelClub): string{
+
         if (this.exists(newClub.getName)) {
            throw new Error('해당 이름의 클럽이 이미 존재합니다.');
         }
+
+        if(this.autoIdMap.size === 0){
+            this.autoIdMap.put("key",1);
+        }
+
+        let keySequence = this.autoIdMap.get("key");
+
+        let blankCnt = 5 - keySequence.toString().length;
+        let result = '';
+        for(let i= 0; i <= blankCnt; i++){
+            result = result + '0';
+        }
+        
+        newClub.setAutoId(String(result + keySequence))
+        
         this.clubMap.set(newClub.getName, newClub);
         return newClub.getName;
     }

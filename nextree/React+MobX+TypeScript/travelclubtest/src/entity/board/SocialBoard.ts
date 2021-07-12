@@ -1,39 +1,42 @@
 
-export class SocialBoard{
+export class SocialBoard {
 
-    private seq : number;
-    private createDate : Date;
+    private seq: number;
+    private createDate: Date;
 
     constructor(
-        private clubId : string, 
-        private name : string,
-        private email : string
-        ){
+        private clubId: string,
+        private name: string,
+        private email: string
+    ) {
         this.clubId = clubId;
         this.name = name;
         this.email = email;
         this.seq = 0;
-        this.createDate = new Date(); 
+        this.createDate = new Date();
     }
 
-    get getClubId(): string{
+    get getClubId(): string {
         return this.clubId;
     }
 
-    get getName(): string{
+    get getName(): string {
         return this.name;
     }
 
-    get getEmail():string{
+    get getEmail(): string {
         return this.email;
     }
-    
-    get nextPostingId(): string{
-        return (this.seq++).toString();
-    }
 
-    printDetails() : void {
-        console.log(`${this.clubId}\t${this.seq}\t${this.email}
-        \t${this.name}\t,${this.createDate}`);
+    get nextPostingId(): string {
+        
+        let blankCnt = 5 - (this.seq++).toString().length;
+        let result = '';
+        for(let i= 0; i <= blankCnt; i++){
+            result = result + '0';
+        }
+
+        return (result + this.seq).toString();
+
     }
 }

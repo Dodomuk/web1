@@ -23,10 +23,14 @@ class MemberStore {
 
     retrieveByName(name: string): CommunityMember[] {
 
-        let list = [];
+        let list = []
 
-        for (let key of this.memberMap) {
-                list.push(key);
+        for (let [, value] of this.memberMap) {
+
+
+            if (value.getName === name) {
+                list.push(value);
+            }
         }
         console.log(list);
         return list;
@@ -43,13 +47,4 @@ class MemberStore {
         return this.memberMap.has(memberId);
     }
 }
-let ms = new MemberStore();
-let newMember = new CommunityMember('nextree@naver.com', 'sss', 'aaa');
-let newMember2 = new CommunityMember('nextree2@naver.com', 'sss', 'aaa');
-ms.create(newMember);
-ms.create(newMember2);
-console.log(newMember);
-console.log('===============');
-ms.retrieveByName('sss');
-
 export default MemberStore;

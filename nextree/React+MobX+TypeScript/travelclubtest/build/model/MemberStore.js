@@ -21,8 +21,10 @@ class MemberStore {
     }
     retrieveByName(name) {
         let list = [];
-        for (let key of this.memberMap) {
-            list.push(key);
+        for (let [key, value] of this.memberMap) {
+            if (value.getName === name) {
+                list.push(value);
+            }
         }
         console.log(list);
         return list;
