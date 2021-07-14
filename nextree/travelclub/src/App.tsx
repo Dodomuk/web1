@@ -5,6 +5,7 @@ import Main from "./view/Main";
 import Nav from "./view/Nav";
 import ClubContainer from './containers/ClubContainer';
 import { PropTypes } from 'mobx-react';
+import ClubView from './view/ClubTopView';
 
 
 class App extends Component{

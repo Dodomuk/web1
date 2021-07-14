@@ -1,15 +1,6 @@
 import React, { PureComponent } from "react";
 import {
   Grid,
-  List,
-  ListItem,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
   Button,
   TextField,
 } from "@material-ui/core";
@@ -17,16 +8,17 @@ import { Save, Delete, Update, Search } from "@material-ui/icons";
 import { NavLink, Route } from "react-router-dom";
 import { grey, blueGrey, lightGreen } from "@material-ui/core/colors";
 import { withStyles } from "@material-ui/core/styles";
-import TravelClub from "../entity/TravelClub";
 
 interface Props {
-  travelClub : TravelClub;
   createClub: Function;
-  newTravelClub: Function;
+  newName: Function;
+  newIntro: Function;
+  name : string;
+  intro : string;
 }
 class ClubView extends PureComponent<Props> {
   render() {
-    const {travelClub , createClub , newTravelClub } = this.props;
+    const {createClub , newName , newIntro , name , intro } = this.props;
 
     //버튼 커스터마이징
     const AddButton = withStyles((theme) => ({
@@ -59,29 +51,29 @@ class ClubView extends PureComponent<Props> {
     }))(Button);
 
     //input
-    const links = (
+    return (
       <form noValidate>
-        <Grid container xs={12} spacing={3}>
+        <Grid container xs={10} spacing={2}>
           <Grid item xs={3}>
             <TextField
               margin="normal"
               id="outlined-basic"
               label="name"
               variant="standard"
-              value={travelClub.setName}
-              onChange={(event) => newTravelClub("name", event.target.value)}
+              value={name}
+              onChange={(event) => newName(event.target.value)}
             />
           </Grid>
-          <Grid container xs={12} spacing={3}>
+          <Grid container xs={12} spacing={2}>
             <Grid item xs={3}>
               <TextField
                 margin="normal"
                 id="outlined-basic"
                 label="intro"
                 variant="standard"
-                value={travelClub.setIntro}
+                value={intro}
                 onChange={(event) =>
-                  newTravelClub("intro", event.target.value)
+                  newIntro(event.target.value)
                 }
               />
             </Grid>
@@ -92,7 +84,7 @@ class ClubView extends PureComponent<Props> {
               variant="contained"
               color="primary"
               startIcon={<Save />}
-              onClick={() => createClub}
+              onClick={() => createClub(name,intro)}
             >
               Add
             </AddButton>
@@ -101,7 +93,6 @@ class ClubView extends PureComponent<Props> {
               variant="contained"
               color="primary"
               startIcon={<Search />}
-              onClick={() => findClub}
             >
               Find
             </ColorButton>
@@ -121,28 +112,6 @@ class ClubView extends PureComponent<Props> {
           </Grid>
         </Grid>
       </form>
-    );
-
-    return (
-      <Grid container spacing={2}>
-        <Grid item alignItems="flex-end"></Grid>
-        <Grid item alignItems="flex-end"></Grid>
-        <Grid item alignItems="flex-end">
-          {links}
-        </Grid>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">클럽</TableCell>
-                <TableCell align="center">소개글</TableCell>
-                <TableCell align="center">가입날짜</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody></TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
     );
   }
 }

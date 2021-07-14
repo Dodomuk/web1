@@ -1,25 +1,57 @@
-import { action, computed, makeObservable, observable } from "mobx";
-import TravelClub from "../entity/TravelClub";
+import { action, computed, makeObservable, observable, toJS } from "mobx";
 
 class ClubStore {
 
-    private _clubStore: Map<string, TravelClub>;
-    private _foundedDate : Date;
-
     @observable
-    private _clubs : TravelClub[] = []; 
+    private clubMap: Map<string, string>;
+    @observable
+    private _foundedDate : Date;
+    @observable
+    private _clubs : Map<string,string>[] = []; 
+    @observable
+    private travelClub : {
+        name : ''; 
+        intro : '';
+    };
+    @observable
+    name : string = '';
+    @observable
+    intro : string = '';
 
     constructor(
     ) {
         makeObservable(this);
         this._foundedDate = new Date();
-        this._clubStore = new Map<string,TravelClub>();
-        this._clubs.forEach(club => this._clubStore.set(club.getName,club));
+        this.clubMap = new Map<string,string>();
+    }
+
+    @computed
+    get getName(){
+        return this.name;
+    }
+
+    @computed
+    get getIntro(){
+        return this.intro;
+    }
+    @computed
+    get getList(){
+
+        return toJS(this._clubs);
+    }
+    @computed
+    get getClub(){
+        return this.clubMap;
     }
 
     @action
-    setTravelClub(name:string,intro:string){
-      let travelClub = new TravelClub(name,intro);
+    setName(name:string){
+        this.name = name;
+    }
+
+    @action
+    setIntro(intro:string){
+        this.intro = intro;
     }
 
     @computed
@@ -29,13 +61,15 @@ class ClubStore {
 
     
     @action
-    register(newClub : ClubStore): void {
+    register(name : string, intro : string): void {
 
-        if(this.exists(newClub.getName)){
+        if(this.exists(name)){
            return alert("이미 존재하는 클럽입니다.");
         }
-        
-        this._clubStore.set(newClub.getName,newClub);
+        this.clubMap.set(name,intro);
+        console.log("map : " + this.clubMap.get(name) + "~" + this.clubMap.values());
+        this._clubs.push(this.clubMap);
+        console.log("clubs : " + this._clubs.values);
         return alert("클럽이 등록되었습니다.");
     }
 
@@ -61,9 +95,8 @@ class ClubStore {
     //     this._clubStore.delete(name);
     // }
 
-    @action
     exists(clubName : string) : boolean {
-        return this._clubStore.has(clubName);
+        return this.clubMap.has(clubName);
     }
 }
 
