@@ -26,17 +26,12 @@ const routes = [
 ];
 
 class AppRouter extends Component {
-
 	render() {
 		return (
 			<Switch>
 				{routes.map((singleRoute) => {
 					const { path, ...otherProps } = singleRoute;
-					return <Route
-						key={path}
-						path={`${path}`}
-						{...otherProps}
-					/>;
+					return <Route key={path} path={`${path}`} component={Club} />;
 				})}
 			</Switch>
 		);
